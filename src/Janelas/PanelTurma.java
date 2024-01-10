@@ -105,7 +105,7 @@ public class PanelTurma extends JPanel {
 						} else {
 							alterarTurma(statement, nometurma);
 						}
-						reiniciarLayout(btRemoverTurma);
+						reiniciarLayout();
 					}
 				}
 			}
@@ -128,7 +128,7 @@ public class PanelTurma extends JPanel {
 					} else {
 						alterarTurma(statement, nometurma);
 					}
-					reiniciarLayout(btRemoverTurma);
+					reiniciarLayout();
 				}
 			}
 
@@ -150,7 +150,7 @@ public class PanelTurma extends JPanel {
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
-					reiniciarLayout(btRemoverTurma);
+					reiniciarLayout();
 				}
 
 			}
@@ -290,7 +290,7 @@ public class PanelTurma extends JPanel {
 		}
 	}
 
-	private void reiniciarLayout(JButton btRemoverTurma) {
+	private void reiniciarLayout() {
 		btRemoverTurma.setVisible(false);
 		btNovaTurma.setText("Nova turma");
 		txtNomeTurma.setText("");
