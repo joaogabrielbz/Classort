@@ -1,0 +1,21 @@
+CREATE SCHEMA classortbd;
+
+CREATE TABLE classortbd.turno (
+    idTurno SERIAL PRIMARY KEY,
+    nomeTurno VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE classortbd.turma (
+    idTurma SERIAL PRIMARY KEY,
+    nomeTurma VARCHAR(100) NOT NULL,
+    turnoId INT,
+    FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
+);
+
+CREATE TABLE classortbd.disciplina (
+    idDisciplina SERIAL PRIMARY KEY,
+    nomeDisciplina VARCHAR(100) NOT NULL,
+    professorDisciplina VARCHAR(100) NOT NULL,
+    turnoId INT,
+    FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
+);
