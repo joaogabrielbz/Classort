@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import Janelas.TelaInicial;;
+import janelas.TelaInicial;;
 
 public class Main {
 
@@ -27,8 +27,7 @@ public class Main {
                 ResultSet resultSet = statement.executeQuery(sql);
 
                 if (resultSet.next()) {
-                    System.out.println("O banco de dados existe");
-                    System.out.println("Iniciando o programa");
+                    System.out.println("O banco de dados existe");                    
                 } else {
                     System.out.println("Criando banco de dados...");
                     File arquivoScript = new File("src/bancodedados/scriptbd.txt");
@@ -37,6 +36,7 @@ public class Main {
                     System.out.println("Banco de dados criado com sucesso");
                 }
                 // Inicia a aplicação //
+                System.out.println("Iniciando o programa");
                 TelaInicial telainicial = new TelaInicial(statement);
                 telainicial.setVisible(true);
             }

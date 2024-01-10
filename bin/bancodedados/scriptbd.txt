@@ -5,6 +5,27 @@ CREATE TABLE classortbd.turno (
     nomeTurno VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE classortbd.horarios (
+    idHorario SERIAL PRIMARY KEY,
+    inicioHorario TIME,
+    fimHorario TIME,
+    turnoId INT,
+    FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
+);
+
+CREATE TABLE classortbd.semana (
+    idSemana SERIAL PRIMARY KEY,
+    segunda BOOLEAN,
+    terca BOOLEAN,
+    quarta BOOLEAN,
+    quinta BOOLEAN,
+    sexta BOOLEAN,
+    sabado BOOLEAN,
+    domingo BOOLEAN,
+    turnoId INT,
+    FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
+);
+
 CREATE TABLE classortbd.turma (
     idTurma SERIAL PRIMARY KEY,
     nomeTurma VARCHAR(100) NOT NULL,
@@ -19,3 +40,38 @@ CREATE TABLE classortbd.disciplina (
     turnoId INT,
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
+
+CREATE TABLE classortbd.turma_disciplina (
+    idTurmaDisciplina SERIAL PRIMARY KEY,
+    qtdAulas INT,
+    idTurma INT,
+    idDisciplina INT,
+    FOREIGN KEY (idTurma) REFERENCES classortbd.turma(idTurma),
+    FOREIGN KEY (idDisciplina) REFERENCES classortbd.disciplina(idDisciplina)
+);
+
+
+
+INSERT INTO classortbd.turno (nomeTurno) VALUES 
+    ('Matutino'),
+    ('Vespertino');
+
+INSERT INTO classortbd.semana (segunda, terca, quarta, quinta, sexta, sabado, domingo, turnoId)
+VALUES (TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, 1);
+
+INSERT INTO classortbd.semana (segunda, terca, quarta, quinta, sexta, sabado, domingo, turnoId)
+VALUES (TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, 2);
+
+INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES 
+    (TIME '07:10:00', TIME '08:00:00', 1),
+    (TIME '08:00:00', TIME '08:50:00', 1),
+    (TIME '08:50:00', TIME '09:40:00', 1),
+    (TIME '10:00:00', TIME '10:50:00', 1),
+    (TIME '10:50:00', TIME '11:40:00', 1);
+
+INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES 
+    (TIME '12:30:00', TIME '13:20:00', 2),
+    (TIME '13:20:00', TIME '14:10:00', 2),
+    (TIME '14:10:00', TIME '15:00:00', 2),
+    (TIME '15:20:00', TIME '16:10:00', 2),
+    (TIME '16:10:00', TIME '17:00:00', 2);
