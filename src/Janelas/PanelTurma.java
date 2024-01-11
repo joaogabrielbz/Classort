@@ -10,6 +10,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.Color;
 
+import entidades.Turma;
 import entidades.Turno;
 
 import javax.swing.border.MatteBorder;
@@ -35,7 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-// TODO: Os métodos nao passam um objeto "turma", apenas o nome da turma //
+
 
 public class PanelTurma extends JPanel {
 	public TelaInicial janela;
@@ -99,12 +100,12 @@ public class PanelTurma extends JPanel {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
 					String nometurma = txtNomeTurma.getText();
-
+					Turma novaTurma = new Turma(0, nometurma, 1);
 					if (!nometurma.isEmpty()) {
 						if (btNovaTurma.getText().equals("Nova turma")) {
-							insertTurma(statement, turno, nometurma);
+							insertTurma(statement, turno, novaTurma);
 						} else {
-							alterarTurma(statement, nometurma);
+							alterarTurma(statement, novaTurma);
 						}
 						reiniciarLayout();
 					}
@@ -122,12 +123,13 @@ public class PanelTurma extends JPanel {
 			public void mousePressed(MouseEvent e) {
 
 				String nometurma = txtNomeTurma.getText();
+				Turma novaTurma = new Turma(0, nometurma, 1);
 
 				if (!nometurma.isEmpty()) {
 					if (btNovaTurma.getText().equals("Nova turma")) {
-						insertTurma(statement, turno, nometurma);
+						insertTurma(statement, turno, novaTurma);
 					} else {
-						alterarTurma(statement, nometurma);
+						alterarTurma(statement, novaTurma);
 					}
 					reiniciarLayout();
 				}
@@ -259,17 +261,17 @@ public class PanelTurma extends JPanel {
 
 	}
 
-	private void insertTurma(Statement statement, Turno turno, String nometurma) {
+	private void insertTurma(Statement statement, Turno turno, Turma novaTurma) {
 		// Verificando se ja existe o mesmo nome na lista //
 		boolean existe = false;
 		for (int i = 0; i != listTurmas.getModel().getSize(); i++) {
-			if (listTurmas.getModel().getElementAt(i).equals(nometurma)) {
+			if (listTurmas.getModel().getElementAt(i).equals(novaTurma.getNomeTurma())) {
 				existe = true;
 			}
 		}
 		// Caso não exista o nome ele salva a nova turma no banco de dados //
 		if (!existe) {
-			String sql = "INSERT INTO classortbd.turma(nometurma, turnoid) VALUES ('" + nometurma + "', "
+			String sql = "INSERT INTO classortbd.turma(nometurma, turnoid) VALUES ('" + novaTurma.getNomeTurma() + "', "
 					+ turno.getIdTurno() + ");";
 			try {
 				statement.execute(sql);
@@ -280,8 +282,8 @@ public class PanelTurma extends JPanel {
 		}
 	}
 
-	private void alterarTurma(Statement statement, String nometurma) {
-		String sql = "UPDATE classortbd.turma SET  nometurma='" + nometurma + "'  WHERE idTurma=" + idTurmaSelecionado
+	private void alterarTurma(Statement statement, Turma novaTurma) {
+		String sql = "UPDATE classortbd.turma SET  nometurma='" + novaTurma.getNomeTurma() + "'  WHERE idTurma=" + idTurmaSelecionado
 				+ ";";
 		try {
 			statement.execute(sql);

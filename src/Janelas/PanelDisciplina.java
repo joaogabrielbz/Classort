@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import entidades.Disciplina;
+import entidades.Turma;
 import entidades.Turno;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,6 +31,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class PanelDisciplina extends JPanel {
 
@@ -42,7 +45,7 @@ public class PanelDisciplina extends JPanel {
 	private JTextField txtNomeDisciplina;
 	private JTextField txtProfessorDisciplina;
 	private JList<String> listDisciplinas;
-	private JButton btNovaDisciplina; 
+	private JButton btNovaDisciplina;
 	private JButton btRemoverDisciplina;
 
 	private static final long serialVersionUID = 1L;
@@ -92,6 +95,25 @@ public class PanelDisciplina extends JPanel {
 		lblNomeDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 
 		txtNomeDisciplina = new JTextField();
+		txtNomeDisciplina.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String nomeDisciplina = txtNomeDisciplina.getText();
+					String professorDisciplina = txtProfessorDisciplina.getText();			
+
+					if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
+						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina, turno.getIdTurno());
+						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
+							insertDisciplina(statement, turno, novaDisciplina);
+						} else {
+							alterarDisciplina(statement, novaDisciplina);
+						}
+						reiniciarLayout();
+					}
+				}
+			}
+		});
 		txtNomeDisciplina.setForeground(Color.WHITE);
 		txtNomeDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		txtNomeDisciplina.setColumns(10);
@@ -103,6 +125,25 @@ public class PanelDisciplina extends JPanel {
 		lblProfessorDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 
 		txtProfessorDisciplina = new JTextField();
+		txtProfessorDisciplina.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String nomeDisciplina = txtNomeDisciplina.getText();
+					String professorDisciplina = txtProfessorDisciplina.getText();			
+
+					if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
+						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina, turno.getIdTurno());
+						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
+							insertDisciplina(statement, turno, novaDisciplina);
+						} else {
+							alterarDisciplina(statement, novaDisciplina);
+						}
+						reiniciarLayout();
+					}
+				}
+			}
+		});
 		txtProfessorDisciplina.setForeground(Color.WHITE);
 		txtProfessorDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		txtProfessorDisciplina.setColumns(10);
@@ -112,13 +153,12 @@ public class PanelDisciplina extends JPanel {
 		btNovaDisciplina.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				
+
 				String nomeDisciplina = txtNomeDisciplina.getText();
-				String professorDisciplina = txtProfessorDisciplina.getText();
-				
-				Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina,professorDisciplina, turno.getIdTurno());
+				String professorDisciplina = txtProfessorDisciplina.getText();			
 
 				if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
+					Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina, turno.getIdTurno());
 					if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 						insertDisciplina(statement, turno, novaDisciplina);
 					} else {
@@ -127,7 +167,7 @@ public class PanelDisciplina extends JPanel {
 					reiniciarLayout();
 				}
 			}
-			
+
 		});
 		btNovaDisciplina.setForeground(Color.WHITE);
 		btNovaDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
@@ -138,7 +178,8 @@ public class PanelDisciplina extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (idDisciplinaSelecionada > 0) {
-					String sql = "DELETE FROM classortbd.disciplina WHERE idDisciplina = " + idDisciplinaSelecionada + "";
+					String sql = "DELETE FROM classortbd.disciplina WHERE idDisciplina = " + idDisciplinaSelecionada
+							+ "";
 					try {
 						statement.execute(sql);
 						listDisciplinas.setModel(gerarListModelDisciplina(statement));
@@ -155,6 +196,50 @@ public class PanelDisciplina extends JPanel {
 		btRemoverDisciplina.setBackground(new Color(172, 0, 9));
 		btRemoverDisciplina.setVisible(false);
 
+		JButton btnAvancar = new JButton("Avançar");
+		btnAvancar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// Lista todas as disciplinas e turmas de determinado turno//
+
+				ArrayList<Turma> turmas = new ArrayList<Turma>();
+				ArrayList<Disciplina> disciplinas = new ArrayList<Disciplina>();
+
+				String sql = "SELECT * FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno();
+				try {
+					ResultSet resultset = statement.executeQuery(sql);
+					while (resultset.next()) {
+						turmas.add(new Turma(resultset.getInt("idturma"), resultset.getString("nometurma"),
+								resultset.getInt("turnoid")));
+
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+
+				sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno();
+				try {
+					ResultSet resultset = statement.executeQuery(sql);
+					while (resultset.next()) {
+						disciplinas.add(
+								new Disciplina(resultset.getInt("iddisciplina"), resultset.getString("nomedisciplina"),
+										resultset.getString("professordisciplina"), resultset.getInt("turnoid")));
+
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+
+				janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas, disciplinas);
+				janela.setContentPane(janela.panelturmadisciplina);
+				janela.revalidate();
+				janela.repaint();
+			}
+		});
+		btnAvancar.setForeground(Color.WHITE);
+		btnAvancar.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btnAvancar.setBackground(new Color(45, 45, 45));
+
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
@@ -164,7 +249,7 @@ public class PanelDisciplina extends JPanel {
 								GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblTitulo, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE))
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
+				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
 						.createSequentialGroup()
 						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(btNovaDisciplina, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
@@ -173,7 +258,7 @@ public class PanelDisciplina extends JPanel {
 						.addGroup(groupLayout.createSequentialGroup()
 								.addComponent(lblNomeDisciplina, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
 								.addGap(225))
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+						.addGroup(groupLayout.createSequentialGroup()
 								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 										.addComponent(txtNomeDisciplina, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
 												404, Short.MAX_VALUE)
@@ -181,27 +266,39 @@ public class PanelDisciplina extends JPanel {
 												GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
 										.addComponent(txtProfessorDisciplina, Alignment.LEADING,
 												GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
+								.addContainerGap())
+						.addGroup(groupLayout.createSequentialGroup()
+								.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap()))));
 		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addGap(20)
 				.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE).addGap(18)
 				.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
-						.createSequentialGroup()
-						.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(txtNomeDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 26,
-								GroupLayout.PREFERRED_SIZE)
-						.addGap(6)
-						.addComponent(txtProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 25,
-								GroupLayout.PREFERRED_SIZE)
-						.addGap(18)
-						.addComponent(btRemoverDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(btNovaDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+				.addGroup(groupLayout
+						.createParallelGroup(
+								Alignment.LEADING)
+						.addGroup(
+								groupLayout.createSequentialGroup()
+										.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 26,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(txtNomeDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 26,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(6)
+										.addComponent(txtProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(18)
+										.addComponent(btRemoverDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(btNovaDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED, 75, Short.MAX_VALUE).addComponent(
+												btnAvancar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
 						.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
 				.addGap(34)));
 
@@ -243,39 +340,40 @@ public class PanelDisciplina extends JPanel {
 	}
 
 	protected void alterarDisciplina(Statement statement, Disciplina novaDisciplina) {
-		String sql = "UPDATE classortbd.disciplina SET nomedisciplina='"+novaDisciplina.getNomeDisciplina()+"', "
-				+ "professordisciplina='"+novaDisciplina.getProfessorDisciplina()+"'"
-				+ "	WHERE idDisciplina = "+idDisciplinaSelecionada+";";
+		String sql = "UPDATE classortbd.disciplina SET nomedisciplina='" + novaDisciplina.getNomeDisciplina() + "', "
+				+ "professordisciplina='" + novaDisciplina.getProfessorDisciplina() + "'" + "	WHERE idDisciplina = "
+				+ idDisciplinaSelecionada + ";";
 		try {
 			statement.execute(sql);
 			listDisciplinas.setModel(gerarListModelDisciplina(statement));
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		
+
 	}
 
 	protected void insertDisciplina(Statement statement, Turno turno2, Disciplina novaDisciplina) {
 		// Verificando se ja existe o mesmo nome na lista //
-				boolean existe = false;
-				for (int i = 0; i != listDisciplinas.getModel().getSize(); i++) {
-					if (listDisciplinas.getModel().getElementAt(i).equals(novaDisciplina.getNomeDisciplina() + " - " +novaDisciplina.getProfessorDisciplina())) {
-						existe = true;
-					}
-				}
-				// Caso não exista o nome ele salva a nova turma no banco de dados //
-				if (!existe) {
-					String sql = "INSERT INTO classortbd.disciplina(nomedisciplina, professordisciplina, turnoid) "
-							+ "VALUES ('"+novaDisciplina.getNomeDisciplina()+"', '"+novaDisciplina.getProfessorDisciplina()+"', "+
-							turno.getIdTurno()+");";
-					try {
-						statement.execute(sql);
-						listDisciplinas.setModel(gerarListModelDisciplina(statement));
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-				}
-		
+		boolean existe = false;
+		for (int i = 0; i != listDisciplinas.getModel().getSize(); i++) {
+			if (listDisciplinas.getModel().getElementAt(i)
+					.equals(novaDisciplina.getNomeDisciplina() + " - " + novaDisciplina.getProfessorDisciplina())) {
+				existe = true;
+			}
+		}
+		// Caso não exista o nome ele salva a nova turma no banco de dados //
+		if (!existe) {
+			String sql = "INSERT INTO classortbd.disciplina(nomedisciplina, professordisciplina, turnoid) "
+					+ "VALUES ('" + novaDisciplina.getNomeDisciplina() + "', '"
+					+ novaDisciplina.getProfessorDisciplina() + "', " + turno.getIdTurno() + ");";
+			try {
+				statement.execute(sql);
+				listDisciplinas.setModel(gerarListModelDisciplina(statement));
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+
 	}
 
 	public DefaultListModel<String> gerarListModelDisciplina(Statement statement) throws SQLException {
@@ -294,12 +392,11 @@ public class PanelDisciplina extends JPanel {
 
 		return modelDisciplina;
 	}
-	
+
 	private void reiniciarLayout() {
 		btRemoverDisciplina.setVisible(false);
 		btNovaDisciplina.setText("Nova disciplina");
 		txtNomeDisciplina.setText("");
 		txtProfessorDisciplina.setText("");
 	}
-
 }

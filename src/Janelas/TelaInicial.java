@@ -37,6 +37,7 @@ public class TelaInicial extends JFrame {
 	private TelaInicial janela = this;
 	public PanelTurma panelturma;
 	public PanelDisciplina paneldisciplina;
+	public PanelTurmaDisciplina panelturmadisciplina;
 
 	public TelaInicial(Statement statement) throws SQLException {
 
