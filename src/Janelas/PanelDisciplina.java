@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import entidades.Disciplina;
 import entidades.Turno;
 import java.awt.Color;
 import java.awt.Font;
@@ -108,6 +109,26 @@ public class PanelDisciplina extends JPanel {
 		txtProfessorDisciplina.setBackground(new Color(45, 45, 45));
 
 		btNovaDisciplina = new JButton("Nova disciplina");
+		btNovaDisciplina.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				
+				String nomeDisciplina = txtNomeDisciplina.getText();
+				String professorDisciplina = txtProfessorDisciplina.getText();
+				
+				Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina,professorDisciplina, turno.getIdTurno());
+
+				if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
+					if (btNovaDisciplina.getText().equals("Nova disciplina")) {
+						insertDisciplina(statement, turno, novaDisciplina);
+					} else {
+						alterarDisciplina(statement, novaDisciplina);
+					}
+					reiniciarLayout();
+				}
+			}
+			
+		});
 		btNovaDisciplina.setForeground(Color.WHITE);
 		btNovaDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btNovaDisciplina.setBackground(new Color(45, 45, 45));
@@ -219,6 +240,42 @@ public class PanelDisciplina extends JPanel {
 		setLayout(groupLayout);
 
 		listDisciplinas.setModel(gerarListModelDisciplina(statement));
+	}
+
+	protected void alterarDisciplina(Statement statement, Disciplina novaDisciplina) {
+		String sql = "UPDATE classortbd.disciplina SET nomedisciplina='"+novaDisciplina.getNomeDisciplina()+"', "
+				+ "professordisciplina='"+novaDisciplina.getProfessorDisciplina()+"'"
+				+ "	WHERE idDisciplina = "+idDisciplinaSelecionada+";";
+		try {
+			statement.execute(sql);
+			listDisciplinas.setModel(gerarListModelDisciplina(statement));
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+	}
+
+	protected void insertDisciplina(Statement statement, Turno turno2, Disciplina novaDisciplina) {
+		// Verificando se ja existe o mesmo nome na lista //
+				boolean existe = false;
+				for (int i = 0; i != listDisciplinas.getModel().getSize(); i++) {
+					if (listDisciplinas.getModel().getElementAt(i).equals(novaDisciplina.getNomeDisciplina() + " - " +novaDisciplina.getProfessorDisciplina())) {
+						existe = true;
+					}
+				}
+				// Caso não exista o nome ele salva a nova turma no banco de dados //
+				if (!existe) {
+					String sql = "INSERT INTO classortbd.disciplina(nomedisciplina, professordisciplina, turnoid) "
+							+ "VALUES ('"+novaDisciplina.getNomeDisciplina()+"', '"+novaDisciplina.getProfessorDisciplina()+"', "+
+							turno.getIdTurno()+");";
+					try {
+						statement.execute(sql);
+						listDisciplinas.setModel(gerarListModelDisciplina(statement));
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+		
 	}
 
 	public DefaultListModel<String> gerarListModelDisciplina(Statement statement) throws SQLException {
