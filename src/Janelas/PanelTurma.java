@@ -49,7 +49,7 @@ public class PanelTurma extends JPanel {
 	private JButton btRemoverTurma;
 	private JTextField txtNomeTurma;
 	private JList<String> listTurmas;
-	private JButton btnAvancar;
+	private JButton btAvancar;
 
 	private static final long serialVersionUID = 1L;
 
@@ -163,8 +163,8 @@ public class PanelTurma extends JPanel {
 		btRemoverTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btRemoverTurma.setBackground(new Color(172, 0, 9));
 
-		btnAvancar = new JButton("Avançar");
-		btnAvancar.addMouseListener(new MouseAdapter() {
+		btAvancar = new JButton("Avançar");
+		btAvancar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 
@@ -179,9 +179,9 @@ public class PanelTurma extends JPanel {
 
 			}
 		});
-		btnAvancar.setForeground(Color.WHITE);
-		btnAvancar.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
-		btnAvancar.setBackground(new Color(45, 45, 45));
+		btAvancar.setForeground(Color.WHITE);
+		btAvancar.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btAvancar.setBackground(new Color(45, 45, 45));
 
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
@@ -195,7 +195,7 @@ public class PanelTurma extends JPanel {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(btNovaTurma, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
 						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
-				.addGap(262).addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+				.addGap(262).addComponent(btAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
 				.addContainerGap()));
 		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addGap(20)
@@ -210,7 +210,7 @@ public class PanelTurma extends JPanel {
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btRemoverTurma, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btAvancar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
 				.addGap(25)));
 
 		listTurmas = new JList<String>();

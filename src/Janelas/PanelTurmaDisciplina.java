@@ -18,6 +18,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.SwingConstants;
+import javax.swing.JScrollPane;
+import javax.swing.JList;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+import javax.swing.ListSelectionModel;
+import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import javax.swing.JTable;
+import javax.swing.JButton;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class PanelTurmaDisciplina extends JPanel {
 	
@@ -28,6 +38,7 @@ public class PanelTurmaDisciplina extends JPanel {
 	
 
 	private static final long serialVersionUID = 1L;
+	private JTable tableDisciplinasSelecionadas;
 
 	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas, ArrayList<Disciplina> disciplians) {
 		this.janela = janela;
@@ -41,6 +52,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		setForeground(new Color(255, 255, 255));
 		
 		JLabel lblVoltar = new JLabel("< Voltar ");
+		lblVoltar.setBounds(10, 20, 60, 32);
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -51,7 +63,6 @@ public class PanelTurmaDisciplina extends JPanel {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
-
 			}
 
 			@Override
@@ -65,22 +76,76 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblVoltar.setForeground(new Color(136, 136, 136));
 		lblVoltar.setFont(new Font("Noto Sans Light", Font.PLAIN, 16));
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
-		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(1, Short.MAX_VALUE))
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(20)
-					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(18, Short.MAX_VALUE))
-		);
-		setLayout(groupLayout);
+		
+		JScrollPane scrollPaneSelecionadas = new JScrollPane();
+		scrollPaneSelecionadas.setBounds(67, 93, 325, 246);
+		
+		JPanel panelSelecionadas = new JPanel();
+		panelSelecionadas.setBackground(new Color(45, 45, 45));
+		scrollPaneSelecionadas.setViewportView(panelSelecionadas);
+		panelSelecionadas.setLayout(new BorderLayout(0, 0));
+		
+		tableDisciplinasSelecionadas = new JTable();
+		tableDisciplinasSelecionadas.setBackground(new Color(45, 45, 45));
+		panelSelecionadas.add(tableDisciplinasSelecionadas, BorderLayout.CENTER);
+		
+		JScrollPane scrollPaneNaoSelecionadas = new JScrollPane();
+		scrollPaneNaoSelecionadas.setBounds(410, 93, 321, 246);
+		
+		JList<String> listSelecionarDisciplinas = new JList<String>();
+		listSelecionarDisciplinas.setVisibleRowCount(10);
+		listSelecionarDisciplinas.setToolTipText("");
+		listSelecionarDisciplinas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listSelecionarDisciplinas.setForeground(Color.WHITE);
+		listSelecionarDisciplinas.setFont(new Font("Noto Sans Light", Font.BOLD, 20));
+		listSelecionarDisciplinas.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		listSelecionarDisciplinas.setBackground(new Color(45, 45, 45));
+		scrollPaneNaoSelecionadas.setViewportView(listSelecionarDisciplinas);
+		
+		JLabel lblDisciplinasDaTurma = new JLabel("Disciplinas da turma:");
+		lblDisciplinasDaTurma.setBounds(67, 52, 321, 41);
+		lblDisciplinasDaTurma.setHorizontalAlignment(SwingConstants.LEFT);
+		lblDisciplinasDaTurma.setForeground(new Color(136, 136, 136));
+		lblDisciplinasDaTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
+		
+		JLabel lblInstrucao = new JLabel("Clique para adicionar:");
+		lblInstrucao.setBounds(410, 52, 321, 41);
+		lblInstrucao.setHorizontalAlignment(SwingConstants.LEFT);
+		lblInstrucao.setForeground(new Color(136, 136, 136));
+		lblInstrucao.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
+		
+		JButton btAvancarDisciplina = new JButton("Avançar");
+		btAvancarDisciplina.setBounds(639, 374, 137, 25);
+		btAvancarDisciplina.setForeground(Color.WHITE);
+		btAvancarDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btAvancarDisciplina.setBackground(new Color(45, 45, 45));
+		
+		JButton btVoltarDisciplina = new JButton("Retornar");
+		btVoltarDisciplina.setBounds(10, 374, 137, 25);
+		btVoltarDisciplina.setForeground(Color.WHITE);
+		btVoltarDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btVoltarDisciplina.setBackground(new Color(45, 45, 45));
+		setLayout(null);
+		
+		JButton btRemover = new JButton("Remover");
+		btRemover.setBounds(67, 340, 325, 25);
+		btRemover.setForeground(Color.WHITE);
+		btRemover.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btRemover.setBackground(new Color(172, 0, 9));
+		add(btRemover);
+		add(lblVoltar);
+		add(lblDisciplinasDaTurma);
+		add(lblInstrucao);
+		add(scrollPaneSelecionadas);
+		add(scrollPaneNaoSelecionadas);
+		add(btVoltarDisciplina);
+		add(btAvancarDisciplina);
+		
+		carregarDisciplinas(statement);
+	}
 
+	private void carregarDisciplinas(Statement statement) {
+		
+		
 	}
 }
