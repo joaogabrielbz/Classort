@@ -30,27 +30,32 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class PanelTurmaDisciplina extends JPanel {
-	
+
 	private TelaInicial janela;
 	private Turno turno;
 	private ArrayList<Turma> turmas;
 	private ArrayList<Disciplina> disciplians;
 	
+	private int indexTurma = 0;
+		
+	private JTable tableDisciplinasSelecionadas;
+	private JLabel lblTitulo;
+	private JButton btAvancarTurma;
+	private JButton btVoltarTurma;
 
 	private static final long serialVersionUID = 1L;
-	private JTable tableDisciplinasSelecionadas;
+	
 
-	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas, ArrayList<Disciplina> disciplians) {
+	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas,
+			ArrayList<Disciplina> disciplians) {
 		this.janela = janela;
 		this.turno = turno;
 		this.turmas = turmas;
 		this.disciplians = disciplians;
-		
-		
-		
+
 		setBackground(new Color(30, 30, 30));
 		setForeground(new Color(255, 255, 255));
-		
+
 		JLabel lblVoltar = new JLabel("< Voltar ");
 		lblVoltar.setBounds(10, 20, 60, 32);
 		lblVoltar.addMouseListener(new MouseAdapter() {
@@ -76,22 +81,22 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblVoltar.setForeground(new Color(136, 136, 136));
 		lblVoltar.setFont(new Font("Noto Sans Light", Font.PLAIN, 16));
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
-		
+
 		JScrollPane scrollPaneSelecionadas = new JScrollPane();
 		scrollPaneSelecionadas.setBounds(67, 93, 325, 246);
-		
+
 		JPanel panelSelecionadas = new JPanel();
 		panelSelecionadas.setBackground(new Color(45, 45, 45));
 		scrollPaneSelecionadas.setViewportView(panelSelecionadas);
 		panelSelecionadas.setLayout(new BorderLayout(0, 0));
-		
+
 		tableDisciplinasSelecionadas = new JTable();
 		tableDisciplinasSelecionadas.setBackground(new Color(45, 45, 45));
 		panelSelecionadas.add(tableDisciplinasSelecionadas, BorderLayout.CENTER);
-		
+
 		JScrollPane scrollPaneNaoSelecionadas = new JScrollPane();
 		scrollPaneNaoSelecionadas.setBounds(410, 93, 321, 246);
-		
+
 		JList<String> listSelecionarDisciplinas = new JList<String>();
 		listSelecionarDisciplinas.setVisibleRowCount(10);
 		listSelecionarDisciplinas.setToolTipText("");
@@ -101,51 +106,92 @@ public class PanelTurmaDisciplina extends JPanel {
 		listSelecionarDisciplinas.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listSelecionarDisciplinas.setBackground(new Color(45, 45, 45));
 		scrollPaneNaoSelecionadas.setViewportView(listSelecionarDisciplinas);
-		
-		JLabel lblDisciplinasDaTurma = new JLabel("Disciplinas da turma:");
-		lblDisciplinasDaTurma.setBounds(67, 52, 321, 41);
-		lblDisciplinasDaTurma.setHorizontalAlignment(SwingConstants.LEFT);
-		lblDisciplinasDaTurma.setForeground(new Color(136, 136, 136));
-		lblDisciplinasDaTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
-		
+
+		lblTitulo = new JLabel("Disciplinas da turma:");
+		lblTitulo.setBounds(67, 52, 321, 41);
+		lblTitulo.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTitulo.setForeground(new Color(136, 136, 136));
+		lblTitulo.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
+
 		JLabel lblInstrucao = new JLabel("Clique para adicionar:");
 		lblInstrucao.setBounds(410, 52, 321, 41);
 		lblInstrucao.setHorizontalAlignment(SwingConstants.LEFT);
 		lblInstrucao.setForeground(new Color(136, 136, 136));
 		lblInstrucao.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
-		
-		JButton btAvancarDisciplina = new JButton("Avançar");
-		btAvancarDisciplina.setBounds(639, 374, 137, 25);
-		btAvancarDisciplina.setForeground(Color.WHITE);
-		btAvancarDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
-		btAvancarDisciplina.setBackground(new Color(45, 45, 45));
-		
-		JButton btVoltarDisciplina = new JButton("Retornar");
-		btVoltarDisciplina.setBounds(10, 374, 137, 25);
-		btVoltarDisciplina.setForeground(Color.WHITE);
-		btVoltarDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
-		btVoltarDisciplina.setBackground(new Color(45, 45, 45));
+
+		btAvancarTurma = new JButton("Avançar");
+		btAvancarTurma.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(indexTurma != turmas.size()-1) {
+					indexTurma++;
+					carregarDisciplinas(statement);
+				}
+			}
+		});
+		btAvancarTurma.setHorizontalAlignment(SwingConstants.RIGHT);
+		btAvancarTurma.setBounds(639, 374, 137, 25);
+		btAvancarTurma.setForeground(Color.WHITE);
+		btAvancarTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btAvancarTurma.setBackground(new Color(45, 45, 45));
+
+		btVoltarTurma = new JButton("Retornar");
+		btVoltarTurma.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(indexTurma != 0) {
+					indexTurma--;
+					carregarDisciplinas(statement);
+				}				
+			}
+		});
+		btVoltarTurma.setHorizontalAlignment(SwingConstants.LEFT);
+		btVoltarTurma.setBounds(10, 374, 137, 25);
+		btVoltarTurma.setForeground(Color.WHITE);
+		btVoltarTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btVoltarTurma.setBackground(new Color(45, 45, 45));
 		setLayout(null);
-		
+
 		JButton btRemover = new JButton("Remover");
+		btRemover.setVisible(false);
 		btRemover.setBounds(67, 340, 325, 25);
 		btRemover.setForeground(Color.WHITE);
 		btRemover.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btRemover.setBackground(new Color(172, 0, 9));
 		add(btRemover);
 		add(lblVoltar);
-		add(lblDisciplinasDaTurma);
+		add(lblTitulo);
 		add(lblInstrucao);
 		add(scrollPaneSelecionadas);
 		add(scrollPaneNaoSelecionadas);
-		add(btVoltarDisciplina);
-		add(btAvancarDisciplina);
-		
+		add(btVoltarTurma);
+		add(btAvancarTurma);
+
 		carregarDisciplinas(statement);
 	}
 
 	private void carregarDisciplinas(Statement statement) {
+		lblTitulo.setText("Disciplinas da turma "+turmas.get(indexTurma).getNomeTurma()+":");
 		
+		if(indexTurma == 0) {
+			btVoltarTurma.setVisible(false);
+		}
+		else {
+			if(indexTurma == 1) {
+				btVoltarTurma.setVisible(true);
+			}
+			btVoltarTurma.setText("< "+turmas.get(indexTurma-1).getNomeTurma());
+		}
+		
+		if(indexTurma == turmas.size()-1) {
+			btAvancarTurma.setVisible(false);
+		}
+		else {
+			if(indexTurma == turmas.size()-2) {
+				btAvancarTurma.setVisible(true);
+			}
+			btAvancarTurma.setText(turmas.get(indexTurma+1).getNomeTurma()+" >");
+		}
 		
 	}
 }
