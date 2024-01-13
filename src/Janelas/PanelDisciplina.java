@@ -98,12 +98,13 @@ public class PanelDisciplina extends JPanel {
 		txtNomeDisciplina.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String nomeDisciplina = txtNomeDisciplina.getText();
-					String professorDisciplina = txtProfessorDisciplina.getText();			
+					String professorDisciplina = txtProfessorDisciplina.getText();
 
 					if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
-						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina, turno.getIdTurno());
+						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina,
+								turno.getIdTurno());
 						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 							insertDisciplina(statement, turno, novaDisciplina);
 						} else {
@@ -111,6 +112,7 @@ public class PanelDisciplina extends JPanel {
 						}
 						reiniciarLayout();
 					}
+					txtNomeDisciplina.requestFocusInWindow();
 				}
 			}
 		});
@@ -128,12 +130,13 @@ public class PanelDisciplina extends JPanel {
 		txtProfessorDisciplina.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String nomeDisciplina = txtNomeDisciplina.getText();
-					String professorDisciplina = txtProfessorDisciplina.getText();			
+					String professorDisciplina = txtProfessorDisciplina.getText();
 
 					if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
-						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina, turno.getIdTurno());
+						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina,
+								turno.getIdTurno());
 						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 							insertDisciplina(statement, turno, novaDisciplina);
 						} else {
@@ -141,6 +144,7 @@ public class PanelDisciplina extends JPanel {
 						}
 						reiniciarLayout();
 					}
+					txtNomeDisciplina.requestFocusInWindow();
 				}
 			}
 		});
@@ -155,10 +159,11 @@ public class PanelDisciplina extends JPanel {
 			public void mousePressed(MouseEvent e) {
 
 				String nomeDisciplina = txtNomeDisciplina.getText();
-				String professorDisciplina = txtProfessorDisciplina.getText();			
+				String professorDisciplina = txtProfessorDisciplina.getText();
 
 				if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
-					Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina, turno.getIdTurno());
+					Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina,
+							turno.getIdTurno());
 					if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 						insertDisciplina(statement, turno, novaDisciplina);
 					} else {
@@ -166,6 +171,7 @@ public class PanelDisciplina extends JPanel {
 					}
 					reiniciarLayout();
 				}
+				txtNomeDisciplina.requestFocusInWindow();
 			}
 
 		});
@@ -177,18 +183,7 @@ public class PanelDisciplina extends JPanel {
 		btRemoverDisciplina.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (idDisciplinaSelecionada > 0) {
-					String sql = "DELETE FROM classortbd.turma_disciplina WHERE disciplinaId =" +idDisciplinaSelecionada+";" 
-							+ "DELETE FROM classortbd.disciplina WHERE idDisciplina = " + idDisciplinaSelecionada+";";
-					try {
-						statement.execute(sql);
-						listDisciplinas.setModel(gerarListModelDisciplina(statement));
-
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-					reiniciarLayout();
-				}
+				deleteDisciplina(statement);
 			}
 		});
 		btRemoverDisciplina.setForeground(Color.WHITE);
@@ -231,7 +226,8 @@ public class PanelDisciplina extends JPanel {
 				}
 
 				try {
-					janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas, disciplinas);
+					janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas,
+							disciplinas);
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
@@ -245,62 +241,78 @@ public class PanelDisciplina extends JPanel {
 		btnAvancar.setBackground(new Color(45, 45, 45));
 
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
+				.createSequentialGroup().addContainerGap()
+				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
-						.addComponent(lblVoltar, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblVoltar, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 60,
+								GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblTitulo, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
+						.createSequentialGroup()
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(btNovaDisciplina, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
 								.addComponent(btRemoverDisciplina, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
-							.addContainerGap())
+						.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblNomeDisciplina, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-							.addGap(225))
+								.addComponent(lblNomeDisciplina, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+								.addGap(225))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addComponent(txtNomeDisciplina, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-								.addComponent(lblProfessorDisciplina, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
-								.addComponent(txtProfessorDisciplina, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
-							.addContainerGap())
+								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+										.addComponent(txtNomeDisciplina, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+												404, Short.MAX_VALUE)
+										.addComponent(lblProfessorDisciplina, Alignment.LEADING,
+												GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
+										.addComponent(txtProfessorDisciplina, Alignment.LEADING,
+												GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
+								.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())))
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(20)
-					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(txtNomeDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
-							.addComponent(txtProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(btRemoverDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btNovaDisciplina, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+								.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+								.addContainerGap()))));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
+				.createSequentialGroup().addGap(20)
+				.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE).addGap(18)
+				.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(groupLayout
+						.createParallelGroup(
+								Alignment.LEADING)
+						.addGroup(
+								groupLayout.createSequentialGroup()
+										.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 26,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(txtNomeDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 26,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(6)
+										.addComponent(txtProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(18)
+										.addComponent(btRemoverDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(btNovaDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+												Short.MAX_VALUE)
+										.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE))
 						.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
-					.addGap(25))
-		);
+				.addGap(25)));
 
 		listDisciplinas = new JList<String>();
+		listDisciplinas.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+					deleteDisciplina(statement);
+				}
+			}
+		});
 		listDisciplinas.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -396,5 +408,21 @@ public class PanelDisciplina extends JPanel {
 		btNovaDisciplina.setText("Nova disciplina");
 		txtNomeDisciplina.setText("");
 		txtProfessorDisciplina.setText("");
+	}
+
+	private void deleteDisciplina(Statement statement) {
+		if (idDisciplinaSelecionada > 0) {
+			String sql = "DELETE FROM classortbd.turma_disciplina WHERE disciplinaId ="
+					+ idDisciplinaSelecionada + ";" + "DELETE FROM classortbd.disciplina WHERE idDisciplina = "
+					+ idDisciplinaSelecionada + ";";
+			try {
+				statement.execute(sql);
+				listDisciplinas.setModel(gerarListModelDisciplina(statement));
+
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			reiniciarLayout();
+		}
 	}
 }

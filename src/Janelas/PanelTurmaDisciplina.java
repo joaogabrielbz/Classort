@@ -36,6 +36,8 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class PanelTurmaDisciplina extends JPanel {
 
@@ -69,7 +71,6 @@ public class PanelTurmaDisciplina extends JPanel {
 		setForeground(new Color(255, 255, 255));
 
 		JLabel lblVoltar = new JLabel("< Voltar ");
-		lblVoltar.setBounds(10, 20, 60, 32);
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -95,7 +96,6 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
 
 		JScrollPane scrollPaneSelecionadas = new JScrollPane();
-		scrollPaneSelecionadas.setBounds(67, 93, 325, 246);
 
 		JPanel panelSelecionadas = new JPanel();
 		panelSelecionadas.setBackground(new Color(45, 45, 45));
@@ -103,6 +103,14 @@ public class PanelTurmaDisciplina extends JPanel {
 		panelSelecionadas.setLayout(new BorderLayout(0, 0));
 
 		tableDisciplinasSelecionadas = new JTable();
+		tableDisciplinasSelecionadas.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_DELETE ) {
+					deleteTurmaDisciplina(statement);
+				}
+			}
+		});
 		tableDisciplinasSelecionadas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -126,7 +134,7 @@ public class PanelTurmaDisciplina extends JPanel {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			}
+			}			
 		});
 		tableDisciplinasSelecionadas.setForeground(new Color(255, 255, 255));
 		tableDisciplinasSelecionadas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -136,9 +144,14 @@ public class PanelTurmaDisciplina extends JPanel {
 		panelSelecionadas.add(tableDisciplinasSelecionadas, BorderLayout.CENTER);
 
 		JScrollPane scrollPaneNaoSelecionadas = new JScrollPane();
-		scrollPaneNaoSelecionadas.setBounds(410, 93, 321, 246);
 
 		listSelecionarDisciplinas = new JList<String>();
+		listSelecionarDisciplinas.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btRemover.setVisible(false);
+			}
+		});
 		listSelecionarDisciplinas.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting()) {
@@ -169,13 +182,11 @@ public class PanelTurmaDisciplina extends JPanel {
 		scrollPaneNaoSelecionadas.setViewportView(listSelecionarDisciplinas);
 
 		lblTitulo = new JLabel("Disciplinas da turma:");
-		lblTitulo.setBounds(67, 52, 321, 41);
 		lblTitulo.setHorizontalAlignment(SwingConstants.LEFT);
 		lblTitulo.setForeground(new Color(136, 136, 136));
 		lblTitulo.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
 
 		JLabel lblInstrucao = new JLabel("Clique para adicionar:");
-		lblInstrucao.setBounds(410, 52, 321, 41);
 		lblInstrucao.setHorizontalAlignment(SwingConstants.LEFT);
 		lblInstrucao.setForeground(new Color(136, 136, 136));
 		lblInstrucao.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
@@ -195,7 +206,6 @@ public class PanelTurmaDisciplina extends JPanel {
 			}
 		});
 		btAvancarTurma.setHorizontalAlignment(SwingConstants.RIGHT);
-		btAvancarTurma.setBounds(639, 374, 137, 25);
 		btAvancarTurma.setForeground(Color.WHITE);
 		btAvancarTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btAvancarTurma.setBackground(new Color(45, 45, 45));
@@ -215,42 +225,70 @@ public class PanelTurmaDisciplina extends JPanel {
 			}
 		});
 		btVoltarTurma.setHorizontalAlignment(SwingConstants.LEFT);
-		btVoltarTurma.setBounds(10, 374, 137, 25);
 		btVoltarTurma.setForeground(Color.WHITE);
 		btVoltarTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btVoltarTurma.setBackground(new Color(45, 45, 45));
-		setLayout(null);
 
 		btRemover = new JButton("Remover");
 		btRemover.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (idTurmaDisciplinaSelecionada > 0) {
-					String sql = "DELETE FROM classortbd.turma_disciplina WHERE idTurmaDisciplina = "
-							+ idTurmaDisciplinaSelecionada + ";";
-					try {
-						statement.execute(sql);
-						btRemover.setVisible(false);
-						carregarDisciplinas(statement);
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-				}
+				deleteTurmaDisciplina(statement);
 			}
 		});
 		btRemover.setVisible(false);
-		btRemover.setBounds(67, 340, 325, 25);
 		btRemover.setForeground(Color.WHITE);
 		btRemover.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btRemover.setBackground(new Color(172, 0, 9));
-		add(btRemover);
-		add(lblVoltar);
-		add(lblTitulo);
-		add(lblInstrucao);
-		add(scrollPaneSelecionadas);
-		add(scrollPaneNaoSelecionadas);
-		add(btVoltarTurma);
-		add(btAvancarTurma);
+		GroupLayout groupLayout = new GroupLayout(this);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(10)
+					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(67)
+					.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
+					.addGap(22)
+					.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+					.addGap(69))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(67)
+					.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+					.addGap(18)
+					.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
+					.addGap(69))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(67)
+					.addComponent(btRemover, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+					.addGap(408))
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addGap(10)
+					.addComponent(btVoltarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+					.addGap(492)
+					.addComponent(btAvancarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+					.addGap(24))
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(20)
+					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblInstrucao, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+						.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE))
+					.addGap(1)
+					.addComponent(btRemover)
+					.addGap(9)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(btVoltarTurma)
+						.addComponent(btAvancarTurma))
+					.addGap(51))
+		);
+		setLayout(groupLayout);
 
 		carregarDisciplinas(statement);
 	}
@@ -263,7 +301,8 @@ public class PanelTurmaDisciplina extends JPanel {
 
 			// Configurando botões //
 			if (indexTurma == 0) {
-				btVoltarTurma.setVisible(false);
+				btVoltarTurma.setEnabled(false);
+				btVoltarTurma.setText("<");
 			} else {
 				if (indexTurma == 1) {
 					btVoltarTurma.setVisible(true);
@@ -272,7 +311,8 @@ public class PanelTurmaDisciplina extends JPanel {
 			}
 
 			if (indexTurma == turmas.size() - 1) {
-				btAvancarTurma.setVisible(false);
+				btAvancarTurma.setEnabled(false);
+				btAvancarTurma.setText("<");
 			} else {
 				if (indexTurma == turmas.size() - 2) {
 					btAvancarTurma.setVisible(true);
@@ -334,6 +374,20 @@ public class PanelTurmaDisciplina extends JPanel {
 				}
 			}
 			listSelecionarDisciplinas.setModel(modelDisciplinasNaoSelecionadas);
+		}
+	}
+
+	private void deleteTurmaDisciplina(Statement statement) {
+		if (idTurmaDisciplinaSelecionada > 0) {
+			String sql = "DELETE FROM classortbd.turma_disciplina WHERE idTurmaDisciplina = "
+					+ idTurmaDisciplinaSelecionada + ";";
+			try {
+				statement.execute(sql);
+				btRemover.setVisible(false);
+				carregarDisciplinas(statement);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }
