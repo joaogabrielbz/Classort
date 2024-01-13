@@ -337,7 +337,7 @@ public class PanelDisciplina extends JPanel {
 			}
 		});
 		listDisciplinas.setVisibleRowCount(10);
-		listDisciplinas.setToolTipText("");
+		
 		listDisciplinas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listDisciplinas.setForeground(Color.WHITE);
 		listDisciplinas.setFont(new Font("Noto Sans Light", Font.BOLD, 20));

@@ -1,41 +1,36 @@
 package janelas;
 
-import javax.swing.JPanel;
 import java.awt.Color;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 
 import entidades.Disciplina;
 import entidades.Turma;
 import entidades.TurmaDisciplina;
 import entidades.Turno;
-import javax.swing.JLabel;
+
 import javax.swing.border.MatteBorder;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.SwingConstants;
-import javax.swing.JScrollPane;
-import javax.swing.JList;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.BevelBorder;
-import javax.swing.ListSelectionModel;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 
 import java.awt.BorderLayout;
-import javax.swing.JTable;
-import javax.swing.JButton;
+
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.event.ListSelectionEvent;
+
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -48,6 +43,7 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class PanelTurmaDisciplina extends JPanel {
 
@@ -65,13 +61,14 @@ public class PanelTurmaDisciplina extends JPanel {
 	private JLabel lblTitulo;
 	private JButton btAvancarTurma;
 	private JButton btVoltarTurma;
-	private JButton btRemover;
 	private JList<String> listSelecionarDisciplinas;
 
 	private static final long serialVersionUID = 1L;
+	private JButton btnGerarHorarios;
 
 	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas,
 			ArrayList<Disciplina> disciplians) throws SQLException {
+
 		this.janela = janela;
 		this.turno = turno;
 		this.turmas = turmas;
@@ -81,6 +78,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		setForeground(new Color(255, 255, 255));
 
 		JLabel lblVoltar = new JLabel("< Voltar ");
+		
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -107,18 +105,23 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
 
 		JScrollPane scrollPaneSelecionadas = new JScrollPane();
-
+		
 		JPanel panelSelecionadas = new JPanel();
+		
 		panelSelecionadas.setBackground(new Color(45, 45, 45));
 		scrollPaneSelecionadas.setViewportView(panelSelecionadas);
 		panelSelecionadas.setLayout(new BorderLayout(0, 0));
 
 		tableDisciplinasSelecionadas = new JTable();
+		
 		tableDisciplinasSelecionadas.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 					deleteTurmaDisciplina(statement);
+				}
+				if (e.getKeyCode() == KeyEvent.VK_E) {
+					tableDisciplinasSelecionadas.editCellAt(tableDisciplinasSelecionadas.getSelectedRow(), 1);
 				}
 			}
 		});
@@ -126,26 +129,15 @@ public class PanelTurmaDisciplina extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				int indexClicado = tableDisciplinasSelecionadas.getSelectedRow();
-				TurmaDisciplina turmaDisciplinaClicada = turmadisciplinas.get(indexClicado);
+				if(indexClicado != -1) {
+					TurmaDisciplina turmaDisciplinaClicada = turmadisciplinas.get(indexClicado);
 
-				tableDisciplinasSelecionadas.editCellAt(indexClicado, 1);
+					tableDisciplinasSelecionadas.editCellAt(indexClicado, 1);
 
-				idTurmaDisciplinaSelecionada = turmaDisciplinaClicada.getIdTurmaDisciplina();
-
-				String sql = "SELECT * FROM classortbd.disciplina WHERE idDisciplina = "
-						+ turmaDisciplinaClicada.getDisciplinaId() + ";";
-				try {
-					ResultSet r = statement.executeQuery(sql);
-					if (r.next()) {
-						String nomeDisciplina = r.getString("nomedisciplina");
-						String professorDisciplina = r.getString("professordisciplina");
-
-						btRemover.setVisible(true);
-						btRemover.setText("Remover: " + nomeDisciplina + " - " + professorDisciplina);
-					}
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					idTurmaDisciplinaSelecionada = turmaDisciplinaClicada.getIdTurmaDisciplina();		
+					
+					btnGerarHorarios.setText("Remover");
+					btnGerarHorarios.setBackground(new Color(172,0,9));
 				}
 			}
 
@@ -159,11 +151,13 @@ public class PanelTurmaDisciplina extends JPanel {
 
 		JScrollPane scrollPaneNaoSelecionadas = new JScrollPane();
 
-		listSelecionarDisciplinas = new JList<String>();
+		listSelecionarDisciplinas = new JList<String>();		
 		listSelecionarDisciplinas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				btRemover.setVisible(false);
+				btnGerarHorarios.setText("Gerar horarios");
+				btnGerarHorarios.setBackground(new Color(60,60,60));
+				
 			}
 		});
 		listSelecionarDisciplinas.addListSelectionListener(new ListSelectionListener() {
@@ -187,7 +181,7 @@ public class PanelTurmaDisciplina extends JPanel {
 			}
 		});
 		listSelecionarDisciplinas.setVisibleRowCount(30);
-		listSelecionarDisciplinas.setToolTipText("");
+		
 		listSelecionarDisciplinas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listSelecionarDisciplinas.setForeground(Color.WHITE);
 		listSelecionarDisciplinas.setFont(new Font("Noto Sans Light", Font.BOLD, 20));
@@ -206,19 +200,11 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblInstrucao.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
 
 		btAvancarTurma = new JButton("Avançar");
+		
 		btAvancarTurma.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (indexTurma != turmas.size() - 1) {
-					indexTurma++;
-					try {
-						salvarQtdAulas(statement);
-						carregarDisciplinas(statement);
-
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-				}
+				avancarTurma(statement);
 			}
 		});
 		btAvancarTurma.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -227,81 +213,95 @@ public class PanelTurmaDisciplina extends JPanel {
 		btAvancarTurma.setBackground(new Color(45, 45, 45));
 
 		btVoltarTurma = new JButton("Retornar");
+		
 		btVoltarTurma.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (indexTurma != 0) {
-					indexTurma--;
-					try {
-						salvarQtdAulas(statement);
-						carregarDisciplinas(statement);
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-				}
+				voltarTurma(statement);
 			}
 		});
 		btVoltarTurma.setHorizontalAlignment(SwingConstants.LEFT);
 		btVoltarTurma.setForeground(Color.WHITE);
 		btVoltarTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btVoltarTurma.setBackground(new Color(45, 45, 45));
-
-		btRemover = new JButton("Remover");
-		btRemover.addMouseListener(new MouseAdapter() {
+		
+		btnGerarHorarios = new JButton("Gerar horarios");
+		btnGerarHorarios.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				deleteTurmaDisciplina(statement);
+				if(btnGerarHorarios.getText().equals("Remover")) {
+					deleteTurmaDisciplina(statement);
+				}
+				else {
+					//TODO continuar codigo
+				}
 			}
 		});
-		btRemover.setVisible(false);
-		btRemover.setForeground(Color.WHITE);
-		btRemover.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
-		btRemover.setBackground(new Color(172, 0, 9));
+		btnGerarHorarios.setForeground(Color.WHITE);
+		btnGerarHorarios.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
+		btnGerarHorarios.setBackground(new Color(60, 60, 60));
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING,
-						groupLayout.createSequentialGroup().addGap(10).addComponent(lblVoltar,
-								GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
-				.addGroup(groupLayout.createSequentialGroup().addGap(67)
-						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE).addGap(22)
-						.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE).addGap(69))
-				.addGroup(groupLayout.createSequentialGroup().addGap(67)
-						.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE).addGap(18)
-						.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 321,
-								GroupLayout.PREFERRED_SIZE)
-						.addGap(69))
-				.addGroup(groupLayout.createSequentialGroup().addGap(67)
-						.addComponent(btRemover, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE).addGap(408))
-				.addGroup(groupLayout.createSequentialGroup().addGap(10)
-						.addComponent(btVoltarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE).addGap(506)
-						.addComponent(btAvancarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-						.addContainerGap()));
-		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup().addGap(20)
-						.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblInstrucao, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-						.addGroup(
-								groupLayout.createParallelGroup(Alignment.LEADING)
-										.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246,
-												Short.MAX_VALUE)
-										.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 246,
-												GroupLayout.PREFERRED_SIZE))
-						.addGap(1).addComponent(btRemover).addGap(9)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btVoltarTurma)
-								.addComponent(btAvancarTurma))
-						.addGap(51)));
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+							.addGap(0))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(67)
+							.addComponent(lblTitulo, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+							.addGap(22)
+							.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(67)
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+									.addGap(18)
+									.addComponent(scrollPaneNaoSelecionadas, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(btVoltarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+									.addGap(120)
+									.addComponent(btnGerarHorarios, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+									.addGap(120)
+									.addComponent(btAvancarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)))))
+					.addGap(69))
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(20)
+					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblInstrucao, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+						.addComponent(scrollPaneNaoSelecionadas, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE))
+					.addGap(35)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btVoltarTurma)
+						.addComponent(btAvancarTurma)
+						.addComponent(btnGerarHorarios, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+					.addGap(50))
+		);
 		setLayout(groupLayout);
+
+		
 
 		carregarDisciplinas(statement);
 	}
 
 	private void carregarDisciplinas(Statement statement) throws SQLException {
 		if (turmas.size() != 0) {
+			
+			btnGerarHorarios.setText("Gerar horarios");
+			btnGerarHorarios.setBackground(new Color(60,60,60));
 
 			// Configurando titulo //
-			lblTitulo.setText("Disciplinas da turma " + turmas.get(indexTurma).getNomeTurma() + ":");
+			lblTitulo.setText("Aulas por semana da turma " + turmas.get(indexTurma).getNomeTurma() + ":");
 
 			// Configurando botões //
 			if (indexTurma == 0) {
@@ -359,6 +359,7 @@ public class PanelTurmaDisciplina extends JPanel {
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(0).setPreferredWidth(215);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setPreferredWidth(25);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setCellEditor(new NumerosCellEditor());
+
 			// Configurando List //
 			disciplinasNaoSelecionadas = new ArrayList<Disciplina>();
 			DefaultListModel<String> modelDisciplinasNaoSelecionadas = new DefaultListModel<String>();
@@ -387,12 +388,13 @@ public class PanelTurmaDisciplina extends JPanel {
 			String sql = "DELETE FROM classortbd.turma_disciplina WHERE idTurmaDisciplina = "
 					+ idTurmaDisciplinaSelecionada + ";";
 			try {
-				statement.execute(sql);
-				btRemover.setVisible(false);
+				statement.execute(sql);				
 				carregarDisciplinas(statement);
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			btnGerarHorarios.setText("Gerar horarios");
+			btnGerarHorarios.setBackground(new Color(60,60,60));
 		}
 	}
 
@@ -411,6 +413,31 @@ public class PanelTurmaDisciplina extends JPanel {
 				statement.execute(sql);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+
+	private void voltarTurma(Statement statement) {
+		if (indexTurma != 0) {
+			indexTurma--;
+			try {
+				salvarQtdAulas(statement);
+				carregarDisciplinas(statement);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	private void avancarTurma(Statement statement) {
+		if (indexTurma != turmas.size() - 1) {
+			indexTurma++;
+			try {
+				salvarQtdAulas(statement);
+				carregarDisciplinas(statement);
+
+			} catch (SQLException e1) {
+				e1.printStackTrace();
 			}
 		}
 	}

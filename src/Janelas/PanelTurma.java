@@ -234,7 +234,7 @@ public class PanelTurma extends JPanel {
 			}
 		});
 		listTurmas.setVisibleRowCount(10);
-		listTurmas.setToolTipText("");
+		
 		listTurmas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listTurmas.setForeground(Color.WHITE);
 		listTurmas.setFont(new Font("Noto Sans Light", Font.BOLD, 20));

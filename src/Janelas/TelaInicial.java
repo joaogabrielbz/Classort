@@ -70,7 +70,7 @@ public class TelaInicial extends JFrame {
 
 		});
 		
-		listTurnos.setToolTipText("");
+		
 		listTurnos.setVisibleRowCount(10);
 		listTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listTurnos.setModel(new AbstractListModel() {
