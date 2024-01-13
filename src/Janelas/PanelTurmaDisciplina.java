@@ -39,6 +39,16 @@ import javax.swing.event.ListSelectionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.PlainDocument;
+
+import java.awt.*;
+
 public class PanelTurmaDisciplina extends JPanel {
 
 	private TelaInicial janela;
@@ -117,7 +127,7 @@ public class PanelTurmaDisciplina extends JPanel {
 			public void mousePressed(MouseEvent e) {
 				int indexClicado = tableDisciplinasSelecionadas.getSelectedRow();
 				TurmaDisciplina turmaDisciplinaClicada = turmadisciplinas.get(indexClicado);
-				
+
 				tableDisciplinasSelecionadas.editCellAt(indexClicado, 1);
 
 				idTurmaDisciplinaSelecionada = turmaDisciplinaClicada.getIdTurmaDisciplina();
@@ -139,7 +149,6 @@ public class PanelTurmaDisciplina extends JPanel {
 				}
 			}
 
-			
 		});
 		tableDisciplinasSelecionadas.setForeground(new Color(255, 255, 255));
 		tableDisciplinasSelecionadas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -249,9 +258,10 @@ public class PanelTurmaDisciplina extends JPanel {
 		btRemover.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btRemover.setBackground(new Color(172, 0, 9));
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup().addGap(10).addComponent(lblVoltar,
-						GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING,
+						groupLayout.createSequentialGroup().addGap(10).addComponent(lblVoltar,
+								GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
 				.addGroup(groupLayout.createSequentialGroup().addGap(67)
 						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE).addGap(22)
 						.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE).addGap(69))
@@ -262,10 +272,10 @@ public class PanelTurmaDisciplina extends JPanel {
 						.addGap(69))
 				.addGroup(groupLayout.createSequentialGroup().addGap(67)
 						.addComponent(btRemover, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE).addGap(408))
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup().addGap(10)
-						.addComponent(btVoltarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE).addGap(492)
-						.addComponent(btAvancarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
-						.addGap(24)));
+				.addGroup(groupLayout.createSequentialGroup().addGap(10)
+						.addComponent(btVoltarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE).addGap(506)
+						.addComponent(btAvancarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+						.addContainerGap()));
 		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup().addGap(20)
 						.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
@@ -279,7 +289,7 @@ public class PanelTurmaDisciplina extends JPanel {
 										.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 246,
 												GroupLayout.PREFERRED_SIZE))
 						.addGap(1).addComponent(btRemover).addGap(9)
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(btVoltarTurma)
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btVoltarTurma)
 								.addComponent(btAvancarTurma))
 						.addGap(51)));
 		setLayout(groupLayout);
@@ -315,6 +325,7 @@ public class PanelTurmaDisciplina extends JPanel {
 			}
 
 			// Configurando table //
+
 			turmadisciplinas = new ArrayList<TurmaDisciplina>();
 			DefaultTableModel modelDisciplinasSelecionadas = new DefaultTableModel() {
 				@Override
@@ -347,7 +358,7 @@ public class PanelTurmaDisciplina extends JPanel {
 			tableDisciplinasSelecionadas.setModel(modelDisciplinasSelecionadas);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(0).setPreferredWidth(215);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setPreferredWidth(25);
-
+			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setCellEditor(new NumerosCellEditor());
 			// Configurando List //
 			disciplinasNaoSelecionadas = new ArrayList<Disciplina>();
 			DefaultListModel<String> modelDisciplinasNaoSelecionadas = new DefaultListModel<String>();
@@ -386,12 +397,11 @@ public class PanelTurmaDisciplina extends JPanel {
 	}
 
 	private void salvarQtdAulas(Statement statement) {
-		ArrayList<Object> qtdAulasNovos = new ArrayList<Object>();	
+		ArrayList<Object> qtdAulasNovos = new ArrayList<Object>();
 
 		for (int i = 0; i < tableDisciplinasSelecionadas.getRowCount(); i++) {
 			Object qtd = tableDisciplinasSelecionadas.getModel().getValueAt(i, 1);
 			qtdAulasNovos.add(qtd);
-			System.out.println(qtdAulasNovos.get(i));
 		}
 
 		for (int i = 0; i < turmadisciplinas.size(); i++) {
@@ -401,6 +411,59 @@ public class PanelTurmaDisciplina extends JPanel {
 				statement.execute(sql);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class NumerosCellEditor extends DefaultCellEditor {
+	private JTextField textField;
+
+	public NumerosCellEditor() {
+		super(new JTextField());
+
+		textField = (JTextField) getComponent();
+		textField.setDocument(new NumericDocument(5)); // Defina o valor máximo desejado
+	}
+
+	@Override
+	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+		// Se a célula estiver vazia, preencha com o número 1
+		if (value == null || value.toString().trim().isEmpty()) {
+			value = 1;
+		}
+		return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+	}
+}
+
+class NumericDocument extends PlainDocument {
+	private int maxValue;
+
+	public NumericDocument(int maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	@Override
+	public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+		if (str == null) {
+			return;
+		}
+
+		char[] characters = str.toCharArray();
+		StringBuilder sb = new StringBuilder();
+
+		for (char character : characters) {
+			if (Character.isDigit(character)) {
+				sb.append(character);
+			}
+		}
+
+		String newValue = getText(0, getLength()) + sb.toString();
+		if (!newValue.isEmpty()) {
+			int value = Integer.parseInt(newValue);
+
+			if (value <= maxValue) {
+				super.insertString(offs, sb.toString(), a);
 			}
 		}
 	}
