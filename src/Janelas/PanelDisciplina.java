@@ -178,8 +178,8 @@ public class PanelDisciplina extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (idDisciplinaSelecionada > 0) {
-					String sql = "DELETE FROM classortbd.disciplina WHERE idDisciplina = " + idDisciplinaSelecionada
-							+ "";
+					String sql = "DELETE FROM classortbd.turma_disciplina WHERE disciplinaId =" +idDisciplinaSelecionada+";" 
+							+ "DELETE FROM classortbd.disciplina WHERE idDisciplina = " + idDisciplinaSelecionada+";";
 					try {
 						statement.execute(sql);
 						listDisciplinas.setModel(gerarListModelDisciplina(statement));
@@ -230,7 +230,11 @@ public class PanelDisciplina extends JPanel {
 					e1.printStackTrace();
 				}
 
-				janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas, disciplinas);
+				try {
+					janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas, disciplinas);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 				janela.setContentPane(janela.panelturmadisciplina);
 				janela.revalidate();
 				janela.repaint();

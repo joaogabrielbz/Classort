@@ -145,7 +145,8 @@ public class PanelTurma extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (idTurmaSelecionado > 0) {
-					String sql = "DELETE FROM classortbd.turma WHERE idTurma = " + idTurmaSelecionado + "";
+					String sql = "DELETE FROM classortbd.turma_disciplina WHERE turmaId = "+ idTurmaSelecionado +";"
+							+ "DELETE FROM classortbd.turma WHERE idTurma = " + idTurmaSelecionado + "";
 					try {
 						statement.execute(sql);
 						listTurmas.setModel(gerarListModelTurma(statement));
