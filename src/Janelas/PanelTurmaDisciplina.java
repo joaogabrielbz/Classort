@@ -85,6 +85,7 @@ public class PanelTurmaDisciplina extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				salvarQtdAulas(statement);
 				janela.setContentPane(janela.paneldisciplina);
 				janela.revalidate();
 				janela.repaint();
@@ -106,7 +107,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		tableDisciplinasSelecionadas.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_DELETE ) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 					deleteTurmaDisciplina(statement);
 				}
 			}
@@ -116,6 +117,8 @@ public class PanelTurmaDisciplina extends JPanel {
 			public void mousePressed(MouseEvent e) {
 				int indexClicado = tableDisciplinasSelecionadas.getSelectedRow();
 				TurmaDisciplina turmaDisciplinaClicada = turmadisciplinas.get(indexClicado);
+				
+				tableDisciplinasSelecionadas.editCellAt(indexClicado, 1);
 
 				idTurmaDisciplinaSelecionada = turmaDisciplinaClicada.getIdTurmaDisciplina();
 
@@ -134,7 +137,9 @@ public class PanelTurmaDisciplina extends JPanel {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			}			
+			}
+
+			
 		});
 		tableDisciplinasSelecionadas.setForeground(new Color(255, 255, 255));
 		tableDisciplinasSelecionadas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -198,7 +203,9 @@ public class PanelTurmaDisciplina extends JPanel {
 				if (indexTurma != turmas.size() - 1) {
 					indexTurma++;
 					try {
+						salvarQtdAulas(statement);
 						carregarDisciplinas(statement);
+
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
@@ -217,6 +224,7 @@ public class PanelTurmaDisciplina extends JPanel {
 				if (indexTurma != 0) {
 					indexTurma--;
 					try {
+						salvarQtdAulas(statement);
 						carregarDisciplinas(statement);
 					} catch (SQLException e1) {
 						e1.printStackTrace();
@@ -241,53 +249,39 @@ public class PanelTurmaDisciplina extends JPanel {
 		btRemover.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btRemover.setBackground(new Color(172, 0, 9));
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(10)
-					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(67)
-					.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
-					.addGap(22)
-					.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-					.addGap(69))
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(67)
-					.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
-					.addGap(18)
-					.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE)
-					.addGap(69))
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(67)
-					.addComponent(btRemover, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
-					.addGap(408))
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addGap(10)
-					.addComponent(btVoltarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-					.addGap(492)
-					.addComponent(btAvancarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
-					.addGap(24))
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(20)
-					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblInstrucao, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
-						.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE))
-					.addGap(1)
-					.addComponent(btRemover)
-					.addGap(9)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(btVoltarTurma)
-						.addComponent(btAvancarTurma))
-					.addGap(51))
-		);
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup().addGap(10).addComponent(lblVoltar,
+						GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
+				.addGroup(groupLayout.createSequentialGroup().addGap(67)
+						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE).addGap(22)
+						.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE).addGap(69))
+				.addGroup(groupLayout.createSequentialGroup().addGap(67)
+						.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE).addGap(18)
+						.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 321,
+								GroupLayout.PREFERRED_SIZE)
+						.addGap(69))
+				.addGroup(groupLayout.createSequentialGroup().addGap(67)
+						.addComponent(btRemover, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE).addGap(408))
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup().addGap(10)
+						.addComponent(btVoltarTurma, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE).addGap(492)
+						.addComponent(btAvancarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+						.addGap(24)));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup().addGap(20)
+						.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblInstrucao, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+						.addGroup(
+								groupLayout.createParallelGroup(Alignment.LEADING)
+										.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246,
+												Short.MAX_VALUE)
+										.addComponent(scrollPaneNaoSelecionadas, GroupLayout.PREFERRED_SIZE, 246,
+												GroupLayout.PREFERRED_SIZE))
+						.addGap(1).addComponent(btRemover).addGap(9)
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(btVoltarTurma)
+								.addComponent(btAvancarTurma))
+						.addGap(51)));
 		setLayout(groupLayout);
 
 		carregarDisciplinas(statement);
@@ -305,17 +299,17 @@ public class PanelTurmaDisciplina extends JPanel {
 				btVoltarTurma.setText("<");
 			} else {
 				if (indexTurma == 1) {
-					btVoltarTurma.setVisible(true);
+					btVoltarTurma.setEnabled(true);
 				}
 				btVoltarTurma.setText("< " + turmas.get(indexTurma - 1).getNomeTurma());
 			}
 
 			if (indexTurma == turmas.size() - 1) {
 				btAvancarTurma.setEnabled(false);
-				btAvancarTurma.setText("<");
+				btAvancarTurma.setText(">");
 			} else {
 				if (indexTurma == turmas.size() - 2) {
-					btAvancarTurma.setVisible(true);
+					btAvancarTurma.setEnabled(true);
 				}
 				btAvancarTurma.setText(turmas.get(indexTurma + 1).getNomeTurma() + " >");
 			}
@@ -387,6 +381,26 @@ public class PanelTurmaDisciplina extends JPanel {
 				carregarDisciplinas(statement);
 			} catch (SQLException e1) {
 				e1.printStackTrace();
+			}
+		}
+	}
+
+	private void salvarQtdAulas(Statement statement) {
+		ArrayList<Object> qtdAulasNovos = new ArrayList<Object>();	
+
+		for (int i = 0; i < tableDisciplinasSelecionadas.getRowCount(); i++) {
+			Object qtd = tableDisciplinasSelecionadas.getModel().getValueAt(i, 1);
+			qtdAulasNovos.add(qtd);
+			System.out.println(qtdAulasNovos.get(i));
+		}
+
+		for (int i = 0; i < turmadisciplinas.size(); i++) {
+			String sql = "UPDATE classortbd.turma_disciplina SET qtdaulas=" + qtdAulasNovos.get(i)
+					+ " WHERE idTurmaDisciplina= " + turmadisciplinas.get(i).getIdTurmaDisciplina() + ";";
+			try {
+				statement.execute(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 		}
 	}
