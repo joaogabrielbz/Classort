@@ -444,6 +444,7 @@ public class PanelTurmaDisciplina extends JPanel {
 }
 
 class NumerosCellEditor extends DefaultCellEditor {
+	
 	private JTextField textField;
 
 	public NumerosCellEditor() {
@@ -463,6 +464,7 @@ class NumerosCellEditor extends DefaultCellEditor {
 	}
 }
 
+@SuppressWarnings("serial")
 class NumericDocument extends PlainDocument {
 	private int maxValue;
 

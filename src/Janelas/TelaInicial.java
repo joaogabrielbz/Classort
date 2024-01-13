@@ -117,7 +117,7 @@ public class TelaInicial extends JFrame {
 		listTurnos.setModel(gerarListModelTurno(statement));
 	}
 
-	public DefaultListModel gerarListModelTurno(Statement statement) throws SQLException {
+	public DefaultListModel<String> gerarListModelTurno(Statement statement) throws SQLException {
 
 		String sql = "SELECT * FROM classortbd.turno";
 		ResultSet result = statement.executeQuery(sql);
