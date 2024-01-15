@@ -1,10 +1,8 @@
 package janelas;
 
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+// joaogabrielbz //
 
 import entidades.Turno;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,17 +25,19 @@ import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class TelaInicial extends JFrame {
 
-	private static final long serialVersionUID = 1L;
 	public JPanel contentPane;
+
 	private TelaInicial janela = this;
 	public PanelTurma panelturma;
 	public PanelDisciplina paneldisciplina;
 	public PanelTurmaDisciplina panelturmadisciplina;
+
+	JList<String> listTurnos = new JList<String>();
+
+	private static final long serialVersionUID = 1L;
 
 	public TelaInicial(Statement statement) throws SQLException {
 
@@ -48,10 +48,10 @@ public class TelaInicial extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(800, 450);
 		setLocationRelativeTo(null);
+
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(30, 30, 30));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 
 		JLabel lblBemVindo = new JLabel("Bem vindo ao Classort");
@@ -59,9 +59,6 @@ public class TelaInicial extends JFrame {
 		lblBemVindo.setFont(new Font("Noto Sans Light", Font.PLAIN, 25));
 		lblBemVindo.setHorizontalAlignment(SwingConstants.CENTER);
 
-		JList<String> listTurnos = new JList<String>();
-		
-		
 		listTurnos.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -69,8 +66,7 @@ public class TelaInicial extends JFrame {
 			}
 
 		});
-		
-		
+
 		listTurnos.setVisibleRowCount(10);
 		listTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listTurnos.setModel(new AbstractListModel() {
@@ -113,7 +109,6 @@ public class TelaInicial extends JFrame {
 						.addContainerGap(155, Short.MAX_VALUE)));
 		contentPane.setLayout(gl_contentPane);
 
-		// Listar turnos do banco de dados //
 		listTurnos.setModel(gerarListModelTurno(statement));
 	}
 
@@ -132,21 +127,21 @@ public class TelaInicial extends JFrame {
 	}
 
 	private void SelecionarTurno(Statement statement, JList<String> listTurnos) {
-		// coletando o id do turno clicado //
+		
 		String nomeTurnoSelecionado = (String) listTurnos.getSelectedValue();
 		String sql = "SELECT idturno FROM classortbd.turno WHERE nometurno = '" + nomeTurnoSelecionado + "'";
 		ResultSet result = null;
+		
 		try {
 			result = statement.executeQuery(sql);
 			if (result.next()) {
-
-				// trocando painel para PanelTurma injetando o turno selecionado//
-				Turno turnoSelecionado = new Turno(result.getInt("idturno"), nomeTurnoSelecionado);
+				int idTurno = result.getInt("idturno");
+				
+				Turno turnoSelecionado = new Turno(idTurno, nomeTurnoSelecionado);
 				panelturma = new PanelTurma(statement, janela, turnoSelecionado);
 				janela.setContentPane(panelturma);
 				janela.revalidate();
 				janela.repaint();
-
 			}
 
 		} catch (SQLException e1) {

@@ -1,5 +1,7 @@
 package entidades;
 
+//joaogabrielbz //
+
 public class TurmaDisciplina {
 	private int idTurmaDisciplina;
 	private int qtdAulas;

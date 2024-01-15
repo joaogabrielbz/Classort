@@ -1,5 +1,7 @@
 package janelas;
 
+// joaogabrielbz // 
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -16,10 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -27,7 +26,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import java.awt.Color;
@@ -37,35 +35,36 @@ import java.awt.Toolkit;
 
 public class Main extends JFrame {
 
-	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtUsuario;
 	private JPasswordField txtSenha;
-	static String url = "jdbc:postgresql://localhost:5432/";
-	Main main = this;
+	private Main main = this;
 
-	/**
-	 * Launch the application.
-	 */
+	static String url = "jdbc:postgresql://localhost:5432/";
+
+	private static final long serialVersionUID = 1L;
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 
 					ArrayList<String> dados = new ArrayList<String>();
-
 					String diretorioDoJar = obterDiretorioDoJar();
 					String nomeArquivo = "credenciais.txt";
 					File arquivo = new File(diretorioDoJar, nomeArquivo);
+
 					if (arquivo.exists()) {
 						BufferedReader reader = new BufferedReader(new FileReader(arquivo));
-						 String linha;
-		                    while ((linha = reader.readLine()) != null) {
-		                        dados.add(linha);
-		                    }
+						String linha;
+						while ((linha = reader.readLine()) != null) {
+							dados.add(linha);
+						}
 					}
+
 					Main frame = new Main();
 					frame.setLocationRelativeTo(null);
+
 					if (dados.size() == 0) {
 						frame.setVisible(true);
 					} else {
@@ -81,20 +80,16 @@ public class Main extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public Main() {
 		setTitle("Conexão Postgres");
 		setResizable(false);
-
 		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaInicial.class.getResource("/imgs/icon.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 287, 190);
+
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(30, 30, 30));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
@@ -116,13 +111,13 @@ public class Main extends JFrame {
 						String diretorioDoJar = obterDiretorioDoJar();
 						String nomeArquivo = "credenciais.txt";
 						File arquivo = new File(diretorioDoJar, nomeArquivo);
+
 						try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivo))) {
-	                        writer.write(usuario+"\n"+senha);
-						}
-						catch (Exception e2) {
+							writer.write(usuario + "\n" + senha);
+						} catch (Exception e2) {
 							e2.printStackTrace();
 						}
-						
+
 						main.dispose();
 					}
 
@@ -178,7 +173,6 @@ public class Main extends JFrame {
 				try {
 					criarBd(statement);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -192,7 +186,6 @@ public class Main extends JFrame {
 	}
 
 	private static void criarBd(Statement statement) throws SQLException, IOException {
-		// Verificação do banco de dados //
 		String sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'classortbd';";
 		ResultSet resultSet = statement.executeQuery(sql);
 
@@ -216,19 +209,19 @@ public class Main extends JFrame {
 			statement.execute(sql);
 			System.out.println("Banco de dados criado com sucesso");
 		}
-		// Inicia a aplicação //
+
 		System.out.println("Iniciando o programa");
 		TelaInicial telainicial = new TelaInicial(statement);
 		telainicial.setVisible(true);
 	}
 
 	private static String obterDiretorioDoJar() {
-        try {
-            String caminhoDoJar = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-            String decodedPath = new File(caminhoDoJar).getParent();
-            return decodedPath;
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Erro ao obter o diretório do JAR.", e);
-        }
-    }
+		try {
+			String caminhoDoJar = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			String decodedPath = new File(caminhoDoJar).getParent();
+			return decodedPath;
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("Erro ao obter o diretório do JAR.", e);
+		}
+	}
 }
