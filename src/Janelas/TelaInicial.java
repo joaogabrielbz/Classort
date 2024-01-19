@@ -21,7 +21,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JList;
 import javax.swing.border.SoftBevelBorder;
-import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -68,18 +67,7 @@ public class TelaInicial extends JFrame {
 		});
 
 		listTurnos.setVisibleRowCount(10);
-		listTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listTurnos.setModel(new AbstractListModel() {
-			String[] values = new String[] {};
-
-			public int getSize() {
-				return values.length;
-			}
-
-			public Object getElementAt(int index) {
-				return values[index];
-			}
-		});
+		listTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);	
 		listTurnos.setForeground(new Color(255, 255, 255));
 		listTurnos.setFont(new Font("Noto Sans Light", Font.BOLD, 20));
 		listTurnos.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -117,7 +105,7 @@ public class TelaInicial extends JFrame {
 		String sql = "SELECT * FROM classortbd.turno";
 		ResultSet result = statement.executeQuery(sql);
 
-		DefaultListModel modelTurno = new DefaultListModel();
+		DefaultListModel<String> modelTurno = new DefaultListModel<String>();
 		while (result.next()) {
 			modelTurno.addElement(result.getString("nomeTurno"));
 		}

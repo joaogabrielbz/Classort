@@ -1,13 +1,13 @@
 package janelas;
 
+// joaogabrielbz //
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-
 import entidades.Disciplina;
 import entidades.Turma;
 import entidades.Turno;
@@ -15,7 +15,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
@@ -59,14 +58,12 @@ public class PanelDisciplina extends JPanel {
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-
 				lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(45, 45, 45)));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
 				lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
-
 			}
 
 			@Override
@@ -308,7 +305,7 @@ public class PanelDisciplina extends JPanel {
 		listDisciplinas.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 					deleteDisciplina(statement);
 				}
 			}
@@ -319,7 +316,6 @@ public class PanelDisciplina extends JPanel {
 
 				if (!e.getValueIsAdjusting()) {
 					if (listDisciplinas.getSelectedIndex() != -1) {
-						// Coletando nome e id clicado //
 						String disciplinaProfessor = listDisciplinas.getModel()
 								.getElementAt(listDisciplinas.getSelectedIndex());
 						String[] disciplinaProfessorSeparados = disciplinaProfessor.split(" - ");
@@ -337,7 +333,7 @@ public class PanelDisciplina extends JPanel {
 			}
 		});
 		listDisciplinas.setVisibleRowCount(10);
-		
+
 		listDisciplinas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listDisciplinas.setForeground(Color.WHITE);
 		listDisciplinas.setFont(new Font("Noto Sans Light", Font.BOLD, 20));
@@ -363,7 +359,6 @@ public class PanelDisciplina extends JPanel {
 	}
 
 	protected void insertDisciplina(Statement statement, Turno turno2, Disciplina novaDisciplina) {
-		// Verificando se ja existe o mesmo nome na lista //
 		boolean existe = false;
 		for (int i = 0; i != listDisciplinas.getModel().getSize(); i++) {
 			if (listDisciplinas.getModel().getElementAt(i)
@@ -371,7 +366,6 @@ public class PanelDisciplina extends JPanel {
 				existe = true;
 			}
 		}
-		// Caso não exista o nome ele salva a nova turma no banco de dados //
 		if (!existe) {
 			String sql = "INSERT INTO classortbd.disciplina(nomedisciplina, professordisciplina, turnoid) "
 					+ "VALUES ('" + novaDisciplina.getNomeDisciplina() + "', '"
@@ -387,19 +381,18 @@ public class PanelDisciplina extends JPanel {
 	}
 
 	public DefaultListModel<String> gerarListModelDisciplina(Statement statement) throws SQLException {
-		idsDisciplinas = new ArrayList<Integer>(); // reseta a lista de ids
-		String sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno() + "";
-		ResultSet result = statement.executeQuery(sql);
 
 		DefaultListModel<String> modelDisciplina = new DefaultListModel<String>();
+		idsDisciplinas = new ArrayList<Integer>();
+
+		String sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno() + "";
+		ResultSet result = statement.executeQuery(sql);
 
 		while (result.next()) {
 			String elemento = result.getString("nomeDisciplina") + " - " + result.getString("professorDisciplina");
 			modelDisciplina.addElement(elemento);
 			idsDisciplinas.add(result.getInt("idDisciplina"));
-
 		}
-
 		return modelDisciplina;
 	}
 
@@ -412,9 +405,8 @@ public class PanelDisciplina extends JPanel {
 
 	private void deleteDisciplina(Statement statement) {
 		if (idDisciplinaSelecionada > 0) {
-			String sql = "DELETE FROM classortbd.turma_disciplina WHERE disciplinaId ="
-					+ idDisciplinaSelecionada + ";" + "DELETE FROM classortbd.disciplina WHERE idDisciplina = "
-					+ idDisciplinaSelecionada + ";";
+			String sql = "DELETE FROM classortbd.turma_disciplina WHERE disciplinaId =" + idDisciplinaSelecionada + ";"
+					+ "DELETE FROM classortbd.disciplina WHERE idDisciplina = " + idDisciplinaSelecionada + ";";
 			try {
 				statement.execute(sql);
 				listDisciplinas.setModel(gerarListModelDisciplina(statement));

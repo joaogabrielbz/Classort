@@ -1,18 +1,17 @@
 package janelas;
 
+// joaogabrielbz //
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.Color;
-
 import entidades.Turma;
 import entidades.Turno;
-
 import javax.swing.border.MatteBorder;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -24,20 +23,17 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.border.BevelBorder;
 import javax.swing.ListSelectionModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-
 import javax.swing.DefaultListModel;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class PanelTurma extends JPanel {
+
 	public TelaInicial janela;
 	public Turno turno;
 
@@ -63,14 +59,12 @@ public class PanelTurma extends JPanel {
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-
 				lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(45, 45, 45)));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
 				lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
-
 			}
 
 			@Override
@@ -221,7 +215,7 @@ public class PanelTurma extends JPanel {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					if (listTurmas.getSelectedIndex() != -1) {
-						// Coletando nome e id clicado //
+
 						String nomeTurmaClicada = listTurmas.getModel().getElementAt(listTurmas.getSelectedIndex());
 						txtNomeTurma.setText(nomeTurmaClicada);
 						idTurmaSelecionado = idsTurmas.get(listTurmas.getSelectedIndex());
@@ -234,7 +228,6 @@ public class PanelTurma extends JPanel {
 			}
 		});
 		listTurmas.setVisibleRowCount(10);
-		
 		listTurmas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listTurmas.setForeground(Color.WHITE);
 		listTurmas.setFont(new Font("Noto Sans Light", Font.BOLD, 20));
@@ -247,11 +240,12 @@ public class PanelTurma extends JPanel {
 	}
 
 	public DefaultListModel<String> gerarListModelTurma(Statement statement) throws SQLException {
-		idsTurmas = new ArrayList<Integer>(); // reseta a lista de ids
-		String sql = "SELECT * FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno() + "";
-		ResultSet result = statement.executeQuery(sql);
 
 		DefaultListModel<String> modelTurma = new DefaultListModel<String>();
+		idsTurmas = new ArrayList<Integer>();
+
+		String sql = "SELECT * FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno() + "";
+		ResultSet result = statement.executeQuery(sql);
 
 		while (result.next()) {
 			modelTurma.addElement(result.getString("nomeTurma"));
@@ -264,14 +258,14 @@ public class PanelTurma extends JPanel {
 	}
 
 	private void insertTurma(Statement statement, Turno turno, Turma novaTurma) {
-		// Verificando se ja existe o mesmo nome na lista //
+
 		boolean existe = false;
 		for (int i = 0; i != listTurmas.getModel().getSize(); i++) {
 			if (listTurmas.getModel().getElementAt(i).equals(novaTurma.getNomeTurma())) {
 				existe = true;
 			}
 		}
-		// Caso não exista o nome ele salva a nova turma no banco de dados //
+
 		if (!existe) {
 			String sql = "INSERT INTO classortbd.turma(nometurma, turnoid) VALUES ('" + novaTurma.getNomeTurma() + "', "
 					+ turno.getIdTurno() + ");";

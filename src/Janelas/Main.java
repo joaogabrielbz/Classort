@@ -55,10 +55,11 @@ public class Main extends JFrame {
 					File arquivo = new File(diretorioDoJar, nomeArquivo);
 
 					if (arquivo.exists()) {
-						BufferedReader reader = new BufferedReader(new FileReader(arquivo));
-						String linha;
-						while ((linha = reader.readLine()) != null) {
-							dados.add(linha);
+						try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+							String linha;
+							while ((linha = reader.readLine()) != null) {
+								dados.add(linha);
+							}
 						}
 					}
 
