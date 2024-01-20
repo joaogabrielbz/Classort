@@ -6,9 +6,13 @@ import java.awt.Color;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import javax.swing.GroupLayout.Alignment;
 import entidades.Disciplina;
+import entidades.Horario;
+import entidades.Semana;
 import entidades.Turma;
 import entidades.TurmaDisciplina;
 import entidades.Turno;
@@ -58,6 +62,9 @@ public class PanelTurmaDisciplina extends JPanel {
 	public JButton btGerarHorario = new JButton();
 
 	private JList<String> listSelecionarDisciplinas;
+
+	private ArrayList<Horario> horarios = new ArrayList<Horario>();
+	private Semana semana;
 
 	private static final long serialVersionUID = 1L;
 
@@ -236,8 +243,25 @@ public class PanelTurmaDisciplina extends JPanel {
 							e1.printStackTrace();
 						}
 					}
+
+					for (Turma t : turmas) {
+						String sql = "SELECT * FROM classortbd.turma_disciplina " + "WHERE turmaId = " + t.getIdTurma()
+								+ ";";
+						try {
+							ResultSet r = statement.executeQuery(sql);
+							int contadorDeAulasTotais = 0;
+							while (r.next()) {
+								contadorDeAulasTotais = contadorDeAulasTotais + r.getInt("qtdAulas");
+							}
+							t.setAulasTotais(contadorDeAulasTotais);
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+					}
+
 					// Exibindo na tela //
-					telaRevisao = new TelaRevisao(janela, panelturmadisciplina, disciplinas, maxAulas);
+					telaRevisao = new TelaRevisao(statement, janela, panelturmadisciplina, turmas, disciplinas,
+							maxAulas, horarios, semana);
 					telaRevisao.setResizable(false);
 					telaRevisao.setLocationRelativeTo(janela);
 					telaRevisao.setVisible(true);
@@ -307,6 +331,16 @@ public class PanelTurmaDisciplina extends JPanel {
 		r = statement.executeQuery(sql);
 		while (r.next()) {
 			cont++;
+			Time inicioHorarioT = r.getTime("inicioHorario");
+			Time fimHorarioT = r.getTime("fimHorario");
+
+			LocalTime inicioHorarioLT = inicioHorarioT.toLocalTime();
+			LocalTime fimHorarioLT = fimHorarioT.toLocalTime();
+
+			String inicioHorario = inicioHorarioLT.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+			String fimHorario = fimHorarioLT.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+
+			horarios.add(new Horario(inicioHorario, fimHorario));
 		}
 		return cont;
 	}
@@ -326,20 +360,32 @@ public class PanelTurmaDisciplina extends JPanel {
 		sql = "SELECT * FROM classortbd.semana WHERE turnoId = " + turno.getIdTurno() + ";";
 		r = statement.executeQuery(sql);
 		if (r.next()) {
-			if (r.getBoolean("segunda"))
+
+			boolean segunda = r.getBoolean("segunda");
+			boolean terca = r.getBoolean("terca");
+			boolean quarta = r.getBoolean("quarta");
+			boolean quinta = r.getBoolean("quinta");
+			boolean sexta = r.getBoolean("sexta");
+			boolean sabado = r.getBoolean("sabado");
+			boolean domingo = r.getBoolean("domingo");
+
+			semana = new Semana(segunda, terca, quarta, quinta, sexta, sabado, domingo);
+
+			if (segunda)
 				aulasPorSemana++;
-			if (r.getBoolean("terca"))
+			if (terca)
 				aulasPorSemana++;
-			if (r.getBoolean("quarta"))
+			if (quarta)
 				aulasPorSemana++;
-			if (r.getBoolean("quinta"))
+			if (quinta)
 				aulasPorSemana++;
-			if (r.getBoolean("sexta"))
+			if (sexta)
 				aulasPorSemana++;
-			if (r.getBoolean("sabado"))
+			if (sabado)
 				aulasPorSemana++;
-			if (r.getBoolean("domingo"))
+			if (domingo)
 				aulasPorSemana++;
+
 		}
 		return aulasPorSemana * aulasPorDia;
 	}
