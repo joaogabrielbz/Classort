@@ -7,6 +7,15 @@ public class Disciplina {
     private String nomeDisciplina;
     private String professorDisciplina;
     private int turnoId;
+    
+    private int aulasTotais;
+    
+    public int getAulasTotais() {
+		return aulasTotais;
+	}    
+    public void setAulasTotais(int aulasTotais) {
+		this.aulasTotais = aulasTotais;
+	}   
 	public int getIdDisciplina() {
 		return idDisciplina;
 	}

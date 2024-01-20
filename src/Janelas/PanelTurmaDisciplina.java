@@ -32,35 +32,43 @@ import java.awt.*;
 
 public class PanelTurmaDisciplina extends JPanel {
 
-	@SuppressWarnings("unused")
 	private TelaInicial janela;
-	@SuppressWarnings("unused")
 	private Turno turno;
+	private PanelTurmaDisciplina panelturmadisciplina = this;
 
 	private ArrayList<Turma> turmas;
 	private ArrayList<Disciplina> disciplinas;
 	private ArrayList<Disciplina> disciplinasNaoSelecionadas;
 	private ArrayList<TurmaDisciplina> turmadisciplinas = new ArrayList<TurmaDisciplina>();
+	private TelaRevisao telaRevisao;
 
 	private int indexTurma = 0;
 	private int idTurmaDisciplinaSelecionada = 0;
+
+	private int maxAulas = 0;
+	private int aulasPorDia = 0;
+
+	public boolean telaErroAberta = false;
 
 	private JTable tableDisciplinasSelecionadas;
 	private JLabel lblTitulo;
 	private JButton btAvancarTurma;
 	private JButton btVoltarTurma;
+	public JButton btGerarHorario = new JButton();
+
 	private JList<String> listSelecionarDisciplinas;
 
 	private static final long serialVersionUID = 1L;
-	private JButton btnGerarHorarios;
 
 	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas,
-			ArrayList<Disciplina> disciplians) throws SQLException {
+			ArrayList<Disciplina> disciplinas) throws SQLException {
 
 		this.janela = janela;
 		this.turno = turno;
 		this.turmas = turmas;
-		this.disciplinas = disciplians;
+		this.disciplinas = disciplinas;
+		this.maxAulas = calcularMaxAulas(statement);
+		this.aulasPorDia = getAulasPorDia(statement);
 
 		setBackground(new Color(30, 30, 30));
 		setForeground(new Color(255, 255, 255));
@@ -120,8 +128,8 @@ public class PanelTurmaDisciplina extends JPanel {
 
 					idTurmaDisciplinaSelecionada = turmaDisciplinaClicada.getIdTurmaDisciplina();
 
-					btnGerarHorarios.setText("Remover");
-					btnGerarHorarios.setBackground(new Color(172, 0, 9));
+					btGerarHorario.setText("Remover");
+					btGerarHorario.setBackground(new Color(172, 0, 9));
 				}
 			}
 		});
@@ -138,8 +146,8 @@ public class PanelTurmaDisciplina extends JPanel {
 		listSelecionarDisciplinas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				btnGerarHorarios.setText("Gerar horarios");
-				btnGerarHorarios.setBackground(new Color(60, 60, 60));
+				btGerarHorario.setText("Gerar horarios");
+				btGerarHorario.setBackground(new Color(60, 60, 60));
 			}
 		});
 		listSelecionarDisciplinas.addListSelectionListener(new ListSelectionListener() {
@@ -203,20 +211,41 @@ public class PanelTurmaDisciplina extends JPanel {
 		btVoltarTurma.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btVoltarTurma.setBackground(new Color(45, 45, 45));
 
-		btnGerarHorarios = new JButton("Gerar horarios");
-		btnGerarHorarios.addMouseListener(new MouseAdapter() {
+		btGerarHorario = new JButton("Gerar horarios");
+		btGerarHorario.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (btnGerarHorarios.getText().equals("Remover")) {
+				if (btGerarHorario.getText().equals("Remover")) {
 					deleteTurmaDisciplina(statement);
 				} else {
-					// TODO continuar codigo
+
+					salvarQtdAulas(statement);
+					// Contando aulas totais //
+					for (Disciplina d : disciplinas) {
+						String sql = "SELECT * FROM classortbd.turma_disciplina " + "WHERE disciplinaId = "
+								+ d.getIdDisciplina() + ";";
+						try {
+							ResultSet r = statement.executeQuery(sql);
+							int contadorDeAulasTotais = 0;
+							while (r.next()) {
+								contadorDeAulasTotais = contadorDeAulasTotais + r.getInt("qtdAulas");
+							}
+							d.setAulasTotais(contadorDeAulasTotais);
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+					}
+					// Exibindo na tela //
+					telaRevisao = new TelaRevisao(panelturmadisciplina, disciplinas, maxAulas);
+					telaRevisao.setResizable(false);
+					telaRevisao.setLocationRelativeTo(janela);
+					telaRevisao.setVisible(true);
 				}
 			}
 		});
-		btnGerarHorarios.setForeground(Color.WHITE);
-		btnGerarHorarios.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
-		btnGerarHorarios.setBackground(new Color(60, 60, 60));
+		btGerarHorario.setForeground(Color.WHITE);
+		btGerarHorario.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
+		btGerarHorario.setBackground(new Color(60, 60, 60));
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
@@ -240,7 +269,7 @@ public class PanelTurmaDisciplina extends JPanel {
 														.addComponent(btVoltarTurma, GroupLayout.PREFERRED_SIZE, 137,
 																GroupLayout.PREFERRED_SIZE)
 														.addGap(120)
-														.addComponent(btnGerarHorarios, GroupLayout.DEFAULT_SIZE, 150,
+														.addComponent(btGerarHorario, GroupLayout.DEFAULT_SIZE, 150,
 																Short.MAX_VALUE)
 														.addGap(120).addComponent(btAvancarTurma,
 																GroupLayout.PREFERRED_SIZE, 137,
@@ -260,7 +289,7 @@ public class PanelTurmaDisciplina extends JPanel {
 												Short.MAX_VALUE))
 						.addGap(35)
 						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btVoltarTurma)
-								.addComponent(btAvancarTurma).addComponent(btnGerarHorarios, GroupLayout.PREFERRED_SIZE,
+								.addComponent(btAvancarTurma).addComponent(btGerarHorario, GroupLayout.PREFERRED_SIZE,
 										25, GroupLayout.PREFERRED_SIZE))
 						.addGap(50)));
 		setLayout(groupLayout);
@@ -268,11 +297,57 @@ public class PanelTurmaDisciplina extends JPanel {
 		carregarDisciplinas(statement);
 	}
 
+	private int getAulasPorDia(Statement statement) throws SQLException {
+		int cont = 0;
+		String sql = "";
+		ResultSet r = null;
+
+		sql = "SELECT * FROM classortbd.horarios WHERE turnoId = " + turno.getIdTurno() + ";";
+		r = statement.executeQuery(sql);
+		while (r.next()) {
+			cont++;
+		}
+		return cont;
+	}
+
+	protected int calcularMaxAulas(Statement statement) throws SQLException {
+		int aulasPorDia = 0;
+		int aulasPorSemana = 0;
+		String sql = "";
+		ResultSet r = null;
+
+		sql = "SELECT * FROM classortbd.horarios WHERE turnoId = " + turno.getIdTurno() + ";";
+		r = statement.executeQuery(sql);
+		while (r.next()) {
+			aulasPorDia++;
+		}
+
+		sql = "SELECT * FROM classortbd.semana WHERE turnoId = " + turno.getIdTurno() + ";";
+		r = statement.executeQuery(sql);
+		if (r.next()) {
+			if (r.getBoolean("segunda"))
+				aulasPorSemana++;
+			if (r.getBoolean("terca"))
+				aulasPorSemana++;
+			if (r.getBoolean("quarta"))
+				aulasPorSemana++;
+			if (r.getBoolean("quinta"))
+				aulasPorSemana++;
+			if (r.getBoolean("sexta"))
+				aulasPorSemana++;
+			if (r.getBoolean("sabado"))
+				aulasPorSemana++;
+			if (r.getBoolean("domingo"))
+				aulasPorSemana++;
+		}
+		return aulasPorSemana * aulasPorDia;
+	}
+
 	private void carregarDisciplinas(Statement statement) throws SQLException {
 		if (turmas.size() != 0) {
 
-			btnGerarHorarios.setText("Gerar horarios");
-			btnGerarHorarios.setBackground(new Color(60, 60, 60));
+			btGerarHorario.setText("Gerar horarios");
+			btGerarHorario.setBackground(new Color(60, 60, 60));
 
 			lblTitulo.setText("Aulas por semana da turma " + turmas.get(indexTurma).getNomeTurma() + ":");
 
@@ -283,7 +358,8 @@ public class PanelTurmaDisciplina extends JPanel {
 				if (indexTurma == 1) {
 					btVoltarTurma.setEnabled(true);
 				}
-				btVoltarTurma.setText("< " + turmas.get(indexTurma - 1).getNomeTurma());			}
+				btVoltarTurma.setText("< " + turmas.get(indexTurma - 1).getNomeTurma());
+			}
 
 			if (indexTurma == turmas.size() - 1) {
 				btAvancarTurma.setEnabled(false);
@@ -294,13 +370,13 @@ public class PanelTurmaDisciplina extends JPanel {
 				}
 				btAvancarTurma.setText(turmas.get(indexTurma + 1).getNomeTurma() + " >");
 			}
-			
+
 			turmadisciplinas = new ArrayList<TurmaDisciplina>();
-			DefaultTableModel modelDisciplinasSelecionadas = new DefaultTableModel() {				
+			DefaultTableModel modelDisciplinasSelecionadas = new DefaultTableModel() {
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				public boolean isCellEditable(int row, int column) {					
+				public boolean isCellEditable(int row, int column) {
 					return column == 1;
 				}
 			};
@@ -327,9 +403,9 @@ public class PanelTurmaDisciplina extends JPanel {
 			tableDisciplinasSelecionadas.setModel(modelDisciplinasSelecionadas);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(0).setPreferredWidth(215);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setPreferredWidth(25);
-			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setCellEditor(new NumerosCellEditor());
+			tableDisciplinasSelecionadas.getColumnModel().getColumn(1)
+					.setCellEditor(new NumerosCellEditor(aulasPorDia));
 
-			
 			disciplinasNaoSelecionadas = new ArrayList<Disciplina>();
 			DefaultListModel<String> modelDisciplinasNaoSelecionadas = new DefaultListModel<String>();
 
@@ -362,8 +438,8 @@ public class PanelTurmaDisciplina extends JPanel {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
-			btnGerarHorarios.setText("Gerar horarios");
-			btnGerarHorarios.setBackground(new Color(60, 60, 60));
+			btGerarHorario.setText("Gerar horarios");
+			btGerarHorario.setBackground(new Color(60, 60, 60));
 		}
 	}
 
@@ -411,21 +487,19 @@ public class PanelTurmaDisciplina extends JPanel {
 	}
 }
 
-
 class NumerosCellEditor extends DefaultCellEditor {
 	private static final long serialVersionUID = 1L;
 	private JTextField textField;
 
-	public NumerosCellEditor() {
+	public NumerosCellEditor(int aulasPorDia) {
 		super(new JTextField());
 
 		textField = (JTextField) getComponent();
-		textField.setDocument(new NumericDocument(5)); // Defina o valor máximo desejado
+		textField.setDocument(new NumericDocument(aulasPorDia));
 	}
 
 	@Override
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-		// Se a célula estiver vazia, preencha com o número 1
 		if (value == null || value.toString().trim().isEmpty()) {
 			value = 1;
 		}
