@@ -32,6 +32,7 @@ import java.awt.*;
 
 public class PanelTurmaDisciplina extends JPanel {
 
+	@SuppressWarnings("unused")
 	private TelaInicial janela;
 	private Turno turno;
 	private PanelTurmaDisciplina panelturmadisciplina = this;
@@ -236,7 +237,7 @@ public class PanelTurmaDisciplina extends JPanel {
 						}
 					}
 					// Exibindo na tela //
-					telaRevisao = new TelaRevisao(panelturmadisciplina, disciplinas, maxAulas);
+					telaRevisao = new TelaRevisao(janela, panelturmadisciplina, disciplinas, maxAulas);
 					telaRevisao.setResizable(false);
 					telaRevisao.setLocationRelativeTo(janela);
 					telaRevisao.setVisible(true);
@@ -420,8 +421,7 @@ public class PanelTurmaDisciplina extends JPanel {
 				}
 				if (!estaSelecionada) {
 					disciplinasNaoSelecionadas.add(disciplinas.get(i));
-					modelDisciplinasNaoSelecionadas.addElement(disciplinas.get(i).getNomeDisciplina() + " - "
-							+ disciplinas.get(i).getProfessorDisciplina());
+					modelDisciplinasNaoSelecionadas.addElement(disciplinas.get(i).getNomeCompleto());
 				}
 			}
 			listSelecionarDisciplinas.setModel(modelDisciplinasNaoSelecionadas);

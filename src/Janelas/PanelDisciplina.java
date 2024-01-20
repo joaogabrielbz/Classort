@@ -362,7 +362,7 @@ public class PanelDisciplina extends JPanel {
 		boolean existe = false;
 		for (int i = 0; i != listDisciplinas.getModel().getSize(); i++) {
 			if (listDisciplinas.getModel().getElementAt(i)
-					.equals(novaDisciplina.getNomeDisciplina() + " - " + novaDisciplina.getProfessorDisciplina())) {
+					.equals(novaDisciplina.getNomeCompleto())) {
 				existe = true;
 			}
 		}

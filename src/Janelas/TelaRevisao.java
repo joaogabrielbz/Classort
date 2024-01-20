@@ -30,13 +30,11 @@ public class TelaRevisao extends JDialog {
 
 	private JPanel contentPane;
 	private TelaRevisao telaRevisao = this;
-	private PanelTurmaDisciplina panelturmadisciplina;
-
 	private static final long serialVersionUID = 1L;
 	private JTable tableDisciplinas;
 
-	public TelaRevisao(PanelTurmaDisciplina panelturmadisciplina, ArrayList<Disciplina> disciplinas, int maxAulas) {
-		this.panelturmadisciplina = panelturmadisciplina;
+	public TelaRevisao(TelaInicial janela, PanelTurmaDisciplina panelturmadisciplina, ArrayList<Disciplina> disciplinas,
+			int maxAulas) {
 		setModal(true);
 
 		setTitle("Classort");
@@ -77,8 +75,8 @@ public class TelaRevisao extends JDialog {
 		JButton btAvancar = new JButton("Voltar e editar");
 		btAvancar.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {				
-				if(btAvancar.getText() == "Avançar") {
+			public void mousePressed(MouseEvent e) {
+				if (btAvancar.getText() == "Avançar") {
 					System.out.println("GERANDO HARIRIOS");
 				}
 				telaRevisao.dispose();
@@ -100,33 +98,34 @@ public class TelaRevisao extends JDialog {
 		DefaultTableModel modelDisciplinas = new DefaultTableModel();
 		modelDisciplinas.addColumn("Disciplinas");
 		modelDisciplinas.addColumn("Aulas");
-		
+
 		boolean haAulasAMais = false;
 
 		for (Disciplina d : disciplinas) {
-			String nomeDisciplina = d.getNomeDisciplina();
-			String professorDisciplina = d.getProfessorDisciplina();
 			int aulasTotais = d.getAulasTotais();
 
-			String disicplina = nomeDisciplina + " - " + professorDisciplina;
+			String disicplina = d.getNomeCompleto();
 			String aulas = aulasTotais + "/" + maxAulas;
-			
-			if(aulasTotais > maxAulas) {
+
+			if (aulasTotais > maxAulas) {
 				haAulasAMais = true;
 			}
 
 			modelDisciplinas.addRow(new Object[] { disicplina, aulas });
 		}
-		
-		if(!haAulasAMais) {
+
+		if (!haAulasAMais) {
 			btAvancar.setText("Avançar");
 		}
 
 		tableDisciplinas.setModel(modelDisciplinas);
+		tableDisciplinas.getColumnModel().getColumn(0).setPreferredWidth(240);
 		tableDisciplinas.setDefaultRenderer(Object.class, new CustomRenderer());
 	}
 
 	private class CustomRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {

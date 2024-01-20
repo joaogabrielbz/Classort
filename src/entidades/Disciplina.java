@@ -10,6 +10,11 @@ public class Disciplina {
     
     private int aulasTotais;
     
+    
+    public String getNomeCompleto() {
+    	return getNomeDisciplina()+" - "+getProfessorDisciplina();
+    }
+    
     public int getAulasTotais() {
 		return aulasTotais;
 	}    
