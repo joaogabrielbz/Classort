@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.StringTokenizer;
-
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -16,8 +14,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-
 import entidades.Coordenada;
 import entidades.Disciplina;
 import entidades.Horario;
@@ -25,10 +21,10 @@ import entidades.Realocacao;
 import entidades.Semana;
 import entidades.TabelaDisciplina;
 import entidades.TabelaTurma;
+import entidades.Tabelas;
 import entidades.Turma;
 import entidades.TurmaDisciplina;
 import entidades.Turno;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Toolkit;
@@ -39,21 +35,14 @@ import javax.swing.JLabel;
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 public class TelaHorariosGerados extends JDialog {
 
 	private ArrayList<TurmaDisciplina> turmadisciplinas;;
-	private ArrayList<TabelaTurma> tabelaturmas;
-	private ArrayList<TabelaDisciplina> tabeladisciplinas;
-	
-	private ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
+	private ArrayList<Tabelas> listTabelas = new ArrayList<Tabelas>();
 
 	Random rand = new Random();
 
@@ -69,6 +58,10 @@ public class TelaHorariosGerados extends JDialog {
 	private JTabbedPane tpTurmas;
 	private JTabbedPane tpDisciplinas;
 
+	private ArrayList<Turma> turmas;
+	private ArrayList<Disciplina> disciplinas;
+	private ArrayList<Horario> horarios;
+
 	static {
 		UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
 	}
@@ -77,6 +70,9 @@ public class TelaHorariosGerados extends JDialog {
 			ArrayList<Horario> horarios, Semana semana, Turno turno) throws SQLException {
 		this.aulasPorDia = horarios.size();
 		this.aulasPorSemana = semana.getQtdDias();
+		this.turmas = turmas;
+		this.disciplinas = disciplinas;
+		this.horarios = horarios;
 
 		setTitle("Classort");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaHorariosGerados.class.getResource("/imgs/icon.png")));
@@ -91,6 +87,22 @@ public class TelaHorariosGerados extends JDialog {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
+		contentPane.setLayout(null);	
+
+		if (!gerarTela(statement, disciplinas, turmas, horarios, turno)) {
+			JLabel lblNoExistemHorarios = new JLabel("Não existem horarios possíveis");
+			lblNoExistemHorarios.setBounds(this.getWidth() - lblNoExistemHorarios.getWidth() / 2,
+					this.getHeight() - lblNoExistemHorarios.getHeight() / 2, 334, 41);
+			lblNoExistemHorarios.setHorizontalAlignment(SwingConstants.CENTER);
+			lblNoExistemHorarios.setForeground(new Color(136, 136, 136));
+			lblNoExistemHorarios.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
+			contentPane.add(lblNoExistemHorarios);
+		}
+	}
+
+	private boolean gerarTela(Statement statement, ArrayList<Disciplina> disciplinas, ArrayList<Turma> turmas,
+			ArrayList<Horario> horarios, Turno turno) throws SQLException {
+
 		contentPane.setLayout(new BorderLayout(0, 0));
 
 		tpTurmaOuDisciplina = new JTabbedPane(JTabbedPane.TOP);
@@ -132,54 +144,12 @@ public class TelaHorariosGerados extends JDialog {
 		tpDisciplinas.setUI(new CustomTabbedPaneUI());
 
 		// Criando tabelas vazias por turmas //
-		tabelaturmas = new ArrayList<TabelaTurma>();
-		for (Turma t : turmas) {
-			String[][] matriz = new String[aulasPorDia + 1][aulasPorSemana + 1];
-			matriz[0][0] = t.getNomeTurma();
-
-			int i = 1;
-
-			for (Horario h : horarios) {
-				matriz[i][0] = h.getInicioHorario();
-				i++;
-			}
-
-			String[] dias = { " ", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
-
-			int j = 1;
-
-			while (j != aulasPorSemana + 1) {
-				matriz[0][j] = dias[j];
-				j++;
-			}
-			tabelaturmas.add(new TabelaTurma(t, matriz));
-		}
+		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
 
 		// Criando tabelas vazias por disciplinas //
-		tabeladisciplinas = new ArrayList<TabelaDisciplina>();
-		for (Disciplina d : disciplinas) {
-			String[][] matriz = new String[aulasPorDia + 1][aulasPorSemana + 1];
-			matriz[0][0] = d.getProfessorDisciplina();
+		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(disciplinas, horarios);
 
-			int i = 1;
-
-			for (Horario h : horarios) {
-				matriz[i][0] = h.getInicioHorario();
-				i++;
-			}
-
-			String[] dias = { " ", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
-
-			int j = 1;
-
-			while (j != aulasPorSemana + 1) {
-				matriz[0][j] = dias[j];
-				j++;
-			}
-			tabeladisciplinas.add(new TabelaDisciplina(d, matriz));
-		}
-
-		// Sorteando horarios //
+		// Coletando TurmaDisciplinas//
 		String sql = "SELECT * FROM classortbd.turma_disciplina WHERE turnoId = " + turno.getIdTurno() + " ;";
 		ResultSet r = statement.executeQuery(sql);
 
@@ -201,78 +171,32 @@ public class TelaHorariosGerados extends JDialog {
 				}
 			});
 
-			for (TurmaDisciplina turmadisciplina : turmadisciplinas) {
-				int quantidade = turmadisciplina.getQtdAulas();
-				TabelaDisciplina td = null;
-				TabelaTurma tt = null;
-				int indexTabelaDisciplina = 0;
-				int indexTabelaTurma = 0;
-
-				// Coletando tabeladisciplina correta e seu index //
-				for (TabelaDisciplina temp : tabeladisciplinas) {
-					if (temp.getDisciplina().getIdDisciplina() == turmadisciplina.getDisciplinaId()) {
-						td = temp;
-						break;
-					} else {
-						indexTabelaDisciplina++;
-					}
-				}
-
-				// Coletando tabelaturma correta e seu index //
-				for (TabelaTurma temp : tabelaturmas) {
-					if (temp.getTurma().getIdTurma() == turmadisciplina.getTurmaId()) {
-						tt = temp;
-						break;
-					} else {
-						indexTabelaTurma++;
-					}
-				}
-
-				// Inserindo de acordo com a quantidade de aulas //
-				for (int x = 0; x < quantidade; x++) {
-					int i = 1;
-					int j = 1;
-
-					ArrayList<Coordenada> tentativas = new ArrayList<Coordenada>();
-					while (true) {
-						i = rand.nextInt(tt.getMatriz().length - 1) + 1;
-						j = rand.nextInt(tt.getMatriz()[0].length - 1) + 1;
-
-						boolean jaTentou = false;
-
-						Coordenada temp = new Coordenada(i, j);
-						for (Coordenada c : tentativas) {
-							if (c.i == temp.i && c.j == temp.j) {
-								jaTentou = true;
-								break;
-							}
-						}
-
-						if (!jaTentou) {
-							tentativas.add(temp);
-							if (tentativas.size() != aulasPorDia * aulasPorSemana) {
-								if (tt.getMatriz()[i][j] == null) {
-									if (td.getMatriz()[i][j] == null) {
-										tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-										td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-										break;
-									}
-								}
-							} else {
-								System.out.println("Falhou: " + tt.getTurma().getNomeTurma() + " com "
-										+ td.getDisciplina().getNomeCompleto());								
-								realocacoes.add(new  Realocacao(td,tt));								
-								break;
-							}
-						}
-					}
+			// Gerando horarios e pegando o com menos realocacoes//
+			for (int i = 0; i < 35000; i++) {
+				listTabelas.add(gerarTabelas());
+				if (listTabelas.get(listTabelas.size() - 1).realocacoes.size() == 0) {
+					break;
 				}
 			}
+
+			// Pegando as tabelas que tem menos realocaçoes //
+			Collections.sort(listTabelas, Comparator.comparingInt(tabelas -> tabelas.realocacoes.size()));
+			tabelaturmas = listTabelas.get(0).tabelaturmas;
+			tabeladisciplinas = listTabelas.get(0).tabeladisciplinas;
+			listTabelas.clear();
+
 		}
-		
-		
-		
+
+		if (listTabelas.size() == 35000) {
+			return false;
+		}
+
 		// Criando JTables e exibindo turmas //
+		exibirTabelas(tabelaturmas, tabeladisciplinas);
+		return true;
+	}
+
+	private void exibirTabelas(ArrayList<TabelaTurma> tabelaturmas, ArrayList<TabelaDisciplina> tabeladisciplinas) {
 		for (TabelaTurma tt : tabelaturmas) {
 			DefaultTableModel model = new DefaultTableModel(tt.getMatriz(), tt.getMatriz()[0]);
 			JTable table = new JTable(model) {
@@ -341,6 +265,134 @@ public class TelaHorariosGerados extends JDialog {
 			String nomeTurma = td.getDisciplina().getNomeCompleto();
 			tpDisciplinas.addTab(nomeTurma, scrollPane);
 		}
+	}
+
+	private ArrayList<TabelaDisciplina> gerarTabelaDisciplinaVazia(ArrayList<Disciplina> disciplinas,
+			ArrayList<Horario> horarios) {
+		ArrayList<TabelaDisciplina> tabeladisciplinas = new ArrayList<TabelaDisciplina>();
+		for (Disciplina d : disciplinas) {
+			String[][] matriz = new String[aulasPorDia + 1][aulasPorSemana + 1];
+			matriz[0][0] = d.getProfessorDisciplina();
+
+			int i = 1;
+
+			for (Horario h : horarios) {
+				matriz[i][0] = h.getInicioHorario();
+				i++;
+			}
+
+			String[] dias = { " ", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
+
+			int j = 1;
+
+			while (j != aulasPorSemana + 1) {
+				matriz[0][j] = dias[j];
+				j++;
+			}
+			tabeladisciplinas.add(new TabelaDisciplina(d, matriz));
+		}
+		return tabeladisciplinas;
+	}
+
+	private ArrayList<TabelaTurma> getTabelaTurmaVazia(ArrayList<Turma> turmas, ArrayList<Horario> horarios) {
+		ArrayList<TabelaTurma> tabelaturmas = new ArrayList<TabelaTurma>();
+		for (Turma t : turmas) {
+			String[][] matriz = new String[aulasPorDia + 1][aulasPorSemana + 1];
+			matriz[0][0] = t.getNomeTurma();
+
+			int i = 1;
+
+			for (Horario h : horarios) {
+				matriz[i][0] = h.getInicioHorario();
+				i++;
+			}
+
+			String[] dias = { " ", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
+
+			int j = 1;
+
+			while (j != aulasPorSemana + 1) {
+				matriz[0][j] = dias[j];
+				j++;
+			}
+			tabelaturmas.add(new TabelaTurma(t, matriz));
+		}
+		return tabelaturmas;
+	}
+
+	private Tabelas gerarTabelas() {
+		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
+		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(disciplinas, horarios);
+		ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
+
+		for (TurmaDisciplina turmadisciplina : turmadisciplinas) {
+			int quantidade = turmadisciplina.getQtdAulas();
+			TabelaDisciplina td = null;
+			TabelaTurma tt = null;
+			@SuppressWarnings("unused")
+			int indexTabelaDisciplina = 0;
+			@SuppressWarnings("unused")
+			int indexTabelaTurma = 0;
+
+			// Coletando tabeladisciplina correta e seu index //
+			for (TabelaDisciplina temp : tabeladisciplinas) {
+				if (temp.getDisciplina().getIdDisciplina() == turmadisciplina.getDisciplinaId()) {
+					td = temp;
+					break;
+				} else {
+					indexTabelaDisciplina++;
+				}
+			}
+
+			// Coletando tabelaturma correta e seu index //
+			for (TabelaTurma temp : tabelaturmas) {
+				if (temp.getTurma().getIdTurma() == turmadisciplina.getTurmaId()) {
+					tt = temp;
+					break;
+				} else {
+					indexTabelaTurma++;
+				}
+			}
+
+			// Inserindo de acordo com a quantidade de aulas //
+			for (int x = 0; x < quantidade; x++) {
+				int i = 1;
+				int j = 1;
+
+				ArrayList<Coordenada> tentativas = new ArrayList<Coordenada>();
+				while (true) {
+					i = rand.nextInt(tt.getMatriz().length - 1) + 1;
+					j = rand.nextInt(tt.getMatriz()[0].length - 1) + 1;
+
+					boolean jaTentou = false;
+
+					Coordenada temp = new Coordenada(i, j);
+					for (Coordenada c : tentativas) {
+						if (c.i == temp.i && c.j == temp.j) {
+							jaTentou = true;
+							break;
+						}
+					}
+
+					if (!jaTentou) {
+						tentativas.add(temp);
+						if (tentativas.size() != aulasPorDia * aulasPorSemana) {
+							if (tt.getMatriz()[i][j] == null) {
+								if (td.getMatriz()[i][j] == null) {
+									tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+									td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+									break;
+								}
+							}
+						} else {
+							realocacoes.add(new Realocacao(td, tt));
+							break;
+						}
+					}
+				}
+			}
+		}
+		return new Tabelas(tabelaturmas, tabeladisciplinas, realocacoes);
 	}
 
 	class MultiLineCellRenderer extends DefaultTableCellRenderer {
