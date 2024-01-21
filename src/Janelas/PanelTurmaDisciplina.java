@@ -1,6 +1,6 @@
 package janelas;
 
-// joaogabrielbz // 
+//joaogabrielbz//
 
 import java.awt.Color;
 import java.sql.ResultSet;
@@ -59,6 +59,10 @@ public class PanelTurmaDisciplina extends JPanel {
 	private JLabel lblTitulo;
 	private JButton btAvancarTurma;
 	private JButton btVoltarTurma;
+	private JLabel lblVoltar;
+	private JScrollPane scrollPaneSelecionadas;
+	private JPanel panelSelecionadas;
+	private JScrollPane scrollPaneNaoSelecionadas;
 	public JButton btGerarHorario = new JButton();
 
 	private JList<String> listSelecionarDisciplinas;
@@ -81,7 +85,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		setBackground(new Color(30, 30, 30));
 		setForeground(new Color(255, 255, 255));
 
-		JLabel lblVoltar = new JLabel("< Voltar ");
+		lblVoltar = new JLabel("< Voltar ");
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -106,8 +110,8 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblVoltar.setFont(new Font("Noto Sans Light", Font.PLAIN, 16));
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
 
-		JScrollPane scrollPaneSelecionadas = new JScrollPane();
-		JPanel panelSelecionadas = new JPanel();
+		scrollPaneSelecionadas = new JScrollPane();
+		panelSelecionadas = new JPanel();
 
 		panelSelecionadas.setBackground(new Color(45, 45, 45));
 		scrollPaneSelecionadas.setViewportView(panelSelecionadas);
@@ -148,7 +152,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		tableDisciplinasSelecionadas.setBackground(new Color(45, 45, 45));
 		panelSelecionadas.add(tableDisciplinasSelecionadas, BorderLayout.CENTER);
 
-		JScrollPane scrollPaneNaoSelecionadas = new JScrollPane();
+		scrollPaneNaoSelecionadas = new JScrollPane();
 
 		listSelecionarDisciplinas = new JList<String>();
 		listSelecionarDisciplinas.addMouseListener(new MouseAdapter() {
@@ -228,7 +232,6 @@ public class PanelTurmaDisciplina extends JPanel {
 				} else {
 
 					salvarQtdAulas(statement);
-					// Contando aulas totais //
 					for (Disciplina d : disciplinas) {
 						String sql = "SELECT * FROM classortbd.turma_disciplina " + "WHERE disciplinaId = "
 								+ d.getIdDisciplina() + ";";
@@ -259,7 +262,6 @@ public class PanelTurmaDisciplina extends JPanel {
 						}
 					}
 
-					// Exibindo na tela //
 					telaRevisao = new TelaRevisao(statement, janela, panelturmadisciplina, turmas, disciplinas,
 							maxAulas, horarios, semana);
 					telaRevisao.setResizable(false);

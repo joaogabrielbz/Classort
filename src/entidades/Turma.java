@@ -1,13 +1,19 @@
 package entidades;
 
-//joaogabrielbz //
+//joaogabrielbz//
 
 public class Turma {
 	private int idTurma;
 	private String nomeTurma;
 	private int turnoId;
+	private int aulasTotais; // Fora do construtor //
 
-	private int aulasTotais;
+	public Turma(int idTurma, String nomeTurma, int turnoId) {
+		super();
+		this.idTurma = idTurma;
+		this.nomeTurma = nomeTurma;
+		this.turnoId = turnoId;
+	}
 
 	public int getAulasTotais() {
 		return aulasTotais;
@@ -40,12 +46,4 @@ public class Turma {
 	public void setTurnoId(int turnoId) {
 		this.turnoId = turnoId;
 	}
-
-	public Turma(int idTurma, String nomeTurma, int turnoId) {
-		super();
-		this.idTurma = idTurma;
-		this.nomeTurma = nomeTurma;
-		this.turnoId = turnoId;
-	}
-
 }

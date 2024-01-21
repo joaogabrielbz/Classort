@@ -1,6 +1,6 @@
 package entidades;
 
-//joaogabrielbz //
+//joaogabrielbz//
 
 public class Turno {
 	private int IdTurno;
@@ -27,5 +27,4 @@ public class Turno {
 	public void setNomeTurno(String nomeTurno) {
 		NomeTurno = nomeTurno;
 	}
-
 }

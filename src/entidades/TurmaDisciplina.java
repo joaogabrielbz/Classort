@@ -1,13 +1,13 @@
 package entidades;
 
-//joaogabrielbz //
+//joaogabrielbz//
 
 public class TurmaDisciplina {
 	private int idTurmaDisciplina;
 	private int qtdAulas;
 	private int TurmaId;
 	private int DisciplinaId;
-	
+
 	public TurmaDisciplina(int idTurmaDisciplina, int qtdAulas, int turmaId, int disciplinaId) {
 		super();
 		this.idTurmaDisciplina = idTurmaDisciplina;

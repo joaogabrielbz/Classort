@@ -1,6 +1,6 @@
 package janelas;
 
-// joaogabrielbz //
+//joaogabrielbz//
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,9 +44,12 @@ public class PanelTurma extends JPanel {
 	private JButton btRemoverTurma;
 	private JTextField txtNomeTurma;
 	private JList<String> listTurmas;
+	private JLabel lblVoltar;
+	private JLabel lblTitulo;
+	private JScrollPane scrollPane;
 	private JButton btAvancar;
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;	
 
 	public PanelTurma(Statement statement, TelaInicial janela, Turno turno) throws SQLException {
 		this.janela = janela;
@@ -54,7 +57,7 @@ public class PanelTurma extends JPanel {
 
 		setBackground(new Color(30, 30, 30));
 
-		JLabel lblVoltar = new JLabel("< Voltar ");
+		lblVoltar = new JLabel("< Voltar ");
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
@@ -78,12 +81,12 @@ public class PanelTurma extends JPanel {
 		lblVoltar.setForeground(new Color(136, 136, 136));
 		lblVoltar.setFont(new Font("Noto Sans Light", Font.PLAIN, 16));
 
-		JLabel lblTitulo = new JLabel("Turmas do turno " + turno.getNomeTurno() + ":");
+		lblTitulo = new JLabel("Turmas do turno " + turno.getNomeTurno() + ":");
 		lblTitulo.setHorizontalAlignment(SwingConstants.LEFT);
 		lblTitulo.setForeground(new Color(136, 136, 136));
 		lblTitulo.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
 
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		scrollPane.setBackground(new Color(30, 30, 30));
 
 		txtNomeTurma = new JTextField();
@@ -245,16 +248,13 @@ public class PanelTurma extends JPanel {
 		idsTurmas = new ArrayList<Integer>();
 
 		String sql = "SELECT * FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno() + "";
-		ResultSet result = statement.executeQuery(sql);
+		ResultSet r = statement.executeQuery(sql);
 
-		while (result.next()) {
-			modelTurma.addElement(result.getString("nomeTurma"));
-			idsTurmas.add(result.getInt("idTurma"));
-
+		while (r.next()) {
+			modelTurma.addElement(r.getString("nomeTurma"));
+			idsTurmas.add(r.getInt("idTurma"));
 		}
-
 		return modelTurma;
-
 	}
 
 	private void insertTurma(Statement statement, Turno turno, Turma novaTurma) {
@@ -287,13 +287,7 @@ public class PanelTurma extends JPanel {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-	}
-
-	private void reiniciarLayout() {
-		btRemoverTurma.setVisible(false);
-		btNovaTurma.setText("Nova turma");
-		txtNomeTurma.setText("");
-	}
+	}	
 
 	private void deleteTurma(Statement statement) {
 		if (idTurmaSelecionado > 0) {
@@ -308,5 +302,11 @@ public class PanelTurma extends JPanel {
 			}
 			reiniciarLayout();
 		}
+	}
+	
+	private void reiniciarLayout() {
+		btRemoverTurma.setVisible(false);
+		btNovaTurma.setText("Nova turma");
+		txtNomeTurma.setText("");
 	}
 }

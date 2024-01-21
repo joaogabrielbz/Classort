@@ -1,5 +1,7 @@
 CREATE SCHEMA classortbd;
 
+/* joaogabrielbz */
+
 CREATE TABLE classortbd.turno (
     idTurno SERIAL PRIMARY KEY,
     nomeTurno VARCHAR(100) NOT NULL

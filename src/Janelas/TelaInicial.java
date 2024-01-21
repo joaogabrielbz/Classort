@@ -1,6 +1,6 @@
 package janelas;
 
-// joaogabrielbz //
+//joaogabrielbz//
 
 import entidades.Turno;
 import java.sql.ResultSet;
@@ -28,8 +28,11 @@ import java.awt.event.MouseEvent;
 public class TelaInicial extends JFrame {
 
 	public JPanel contentPane;
+	private JLabel lblBemVindo;
+	private JLabel lblSelecioneOTurno;
 
 	private TelaInicial janela = this;
+
 	public PanelTurma panelturma;
 	public PanelDisciplina paneldisciplina;
 	public PanelTurmaDisciplina panelturmadisciplina;
@@ -53,10 +56,15 @@ public class TelaInicial extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 
-		JLabel lblBemVindo = new JLabel("Bem vindo ao Classort");
+		lblBemVindo = new JLabel("Bem vindo ao Classort");
 		lblBemVindo.setForeground(new Color(136, 136, 136));
 		lblBemVindo.setFont(new Font("Noto Sans Light", Font.PLAIN, 25));
 		lblBemVindo.setHorizontalAlignment(SwingConstants.CENTER);
+
+		lblSelecioneOTurno = new JLabel("Selecione o turno desejado:");
+		lblSelecioneOTurno.setHorizontalAlignment(SwingConstants.LEFT);
+		lblSelecioneOTurno.setForeground(new Color(136, 136, 136));
+		lblSelecioneOTurno.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
 
 		listTurnos.addMouseListener(new MouseAdapter() {
 			@Override
@@ -67,16 +75,12 @@ public class TelaInicial extends JFrame {
 		});
 
 		listTurnos.setVisibleRowCount(10);
-		listTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);	
+		listTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listTurnos.setForeground(new Color(255, 255, 255));
 		listTurnos.setFont(new Font("Noto Sans Light", Font.BOLD, 20));
 		listTurnos.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listTurnos.setBackground(new Color(45, 45, 45));
 
-		JLabel lblSelecioneOTurno = new JLabel("Selecione o turno desejado:");
-		lblSelecioneOTurno.setHorizontalAlignment(SwingConstants.LEFT);
-		lblSelecioneOTurno.setForeground(new Color(136, 136, 136));
-		lblSelecioneOTurno.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup().addContainerGap().addComponent(lblBemVindo,
@@ -103,28 +107,26 @@ public class TelaInicial extends JFrame {
 	public DefaultListModel<String> gerarListModelTurno(Statement statement) throws SQLException {
 
 		String sql = "SELECT * FROM classortbd.turno";
-		ResultSet result = statement.executeQuery(sql);
+		ResultSet r = statement.executeQuery(sql);
 
 		DefaultListModel<String> modelTurno = new DefaultListModel<String>();
-		while (result.next()) {
-			modelTurno.addElement(result.getString("nomeTurno"));
+		while (r.next()) {
+			modelTurno.addElement(r.getString("nomeTurno"));
 		}
-
 		return modelTurno;
-
 	}
 
 	private void SelecionarTurno(Statement statement, JList<String> listTurnos) {
 		
 		String nomeTurnoSelecionado = (String) listTurnos.getSelectedValue();
 		String sql = "SELECT idturno FROM classortbd.turno WHERE nometurno = '" + nomeTurnoSelecionado + "'";
-		ResultSet result = null;
-		
+		ResultSet r = null;
+
 		try {
-			result = statement.executeQuery(sql);
-			if (result.next()) {
-				int idTurno = result.getInt("idturno");
-				
+			r = statement.executeQuery(sql);
+			if (r.next()) {
+				int idTurno = r.getInt("idturno");
+
 				Turno turnoSelecionado = new Turno(idTurno, nomeTurnoSelecionado);
 				panelturma = new PanelTurma(statement, janela, turnoSelecionado);
 				janela.setContentPane(panelturma);

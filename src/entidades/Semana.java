@@ -1,6 +1,6 @@
 package entidades;
 
-// joaogabrielbz //
+//joaogabrielbz//
 
 public class Semana {
 	private boolean segunda;
@@ -10,12 +10,7 @@ public class Semana {
 	private boolean sexta;
 	private boolean sabado;
 	private boolean domingo;
-	
 	private int qtdDias;
-	
-	public int getQtdDias(){
-		return qtdDias;
-	}
 
 	public Semana(boolean segunda, boolean terca, boolean quarta, boolean quinta, boolean sexta, boolean sabado,
 			boolean domingo) {
@@ -27,25 +22,29 @@ public class Semana {
 		this.sexta = sexta;
 		this.sabado = sabado;
 		this.domingo = domingo;
-		
+
 		int cont = 0;
-		
-		if(isSegunda())
+
+		if (isSegunda())
 			cont++;
-		if(isTerca())
+		if (isTerca())
 			cont++;
-		if(isQuarta())
+		if (isQuarta())
 			cont++;
-		if(isQuinta())
+		if (isQuinta())
 			cont++;
-		if(isSexta())
+		if (isSexta())
 			cont++;
-		if(isSabado())
+		if (isSabado())
 			cont++;
-		if(isDomingo())
+		if (isDomingo())
 			cont++;
-		
+
 		this.qtdDias = cont;
+	}
+
+	public int getQtdDias() {
+		return qtdDias;
 	}
 
 	public boolean isSegunda() {

@@ -1,6 +1,6 @@
 package janelas;
 
-// joaogabrielbz // 
+//joaogabrielbz//
 
 import java.awt.EventQueue;
 
@@ -36,19 +36,21 @@ import java.awt.Toolkit;
 public class Main extends JFrame {
 
 	private JPanel contentPane;
+	private JLabel lblUsuario;
 	private JTextField txtUsuario;
-	private JPasswordField txtSenha;
+	private JLabel lblSenha;
+	private JPasswordField txtSenha;	
+	private JButton btEntrar;
 	private Main main = this;
 
 	static String url = "jdbc:postgresql://localhost:5432/";
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;		
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				try {
-
+				try {					
 					ArrayList<String> dados = new ArrayList<String>();
 					String diretorioDoJar = obterDiretorioDoJar();
 					String nomeArquivo = "credenciais.txt";
@@ -62,7 +64,6 @@ public class Main extends JFrame {
 							}
 						}
 					}
-
 					Main frame = new Main();
 					frame.setLocationRelativeTo(null);
 
@@ -72,11 +73,9 @@ public class Main extends JFrame {
 						conectar(url, dados.get(0), dados.get(1));
 						frame.dispose();
 					}
-
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
-
 			}
 		});
 	}
@@ -93,8 +92,37 @@ public class Main extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
+		txtUsuario = new JTextField();
+		txtUsuario.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		txtUsuario.setForeground(new Color(255, 255, 255));
+		txtUsuario.setBackground(new Color(45, 45, 45));
+		txtUsuario.setBounds(10, 45, 257, 20);
+		contentPane.add(txtUsuario);
+		txtUsuario.setColumns(10);
+		
+		lblUsuario = new JLabel("Usuario Postgres:");
+		lblUsuario.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
+		lblUsuario.setForeground(new Color(255, 255, 255));
+		lblUsuario.setBackground(new Color(30, 30, 30));
+		lblUsuario.setBounds(10, 22, 257, 23);
+		contentPane.add(lblUsuario);
 
-		JButton btEntrar = new JButton("Conectar & Salvar");
+		txtSenha = new JPasswordField();
+		txtSenha.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		txtSenha.setForeground(new Color(255, 255, 255));
+		txtSenha.setBackground(new Color(45, 45, 45));
+		txtSenha.setBounds(10, 87, 257, 20);
+		contentPane.add(txtSenha);	
+
+		lblSenha = new JLabel("Senha Postgres:");
+		lblSenha.setForeground(Color.WHITE);
+		lblSenha.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
+		lblSenha.setBackground(new Color(30, 30, 30));
+		lblSenha.setBounds(10, 65, 257, 23);
+		contentPane.add(lblSenha);
+
+		btEntrar = new JButton("Conectar & Salvar");
 		btEntrar.setFont(new Font("Noto Sans Light", Font.PLAIN, 11));
 		btEntrar.setBackground(new Color(45, 45, 45));
 		btEntrar.setForeground(new Color(255, 255, 255));
@@ -132,36 +160,7 @@ public class Main extends JFrame {
 
 		});
 		btEntrar.setBounds(10, 118, 257, 23);
-		contentPane.add(btEntrar);
-
-		txtUsuario = new JTextField();
-		txtUsuario.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
-		txtUsuario.setForeground(new Color(255, 255, 255));
-		txtUsuario.setBackground(new Color(45, 45, 45));
-		txtUsuario.setBounds(10, 45, 257, 20);
-		contentPane.add(txtUsuario);
-		txtUsuario.setColumns(10);
-
-		txtSenha = new JPasswordField();
-		txtSenha.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
-		txtSenha.setForeground(new Color(255, 255, 255));
-		txtSenha.setBackground(new Color(45, 45, 45));
-		txtSenha.setBounds(10, 87, 257, 20);
-		contentPane.add(txtSenha);
-
-		JLabel lblUsuario = new JLabel("Usuario Postgres:");
-		lblUsuario.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
-		lblUsuario.setForeground(new Color(255, 255, 255));
-		lblUsuario.setBackground(new Color(30, 30, 30));
-		lblUsuario.setBounds(10, 22, 257, 23);
-		contentPane.add(lblUsuario);
-
-		JLabel lblSenha = new JLabel("Senha Postgres:");
-		lblSenha.setForeground(Color.WHITE);
-		lblSenha.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
-		lblSenha.setBackground(new Color(30, 30, 30));
-		lblSenha.setBounds(10, 65, 257, 23);
-		contentPane.add(lblSenha);
+		contentPane.add(btEntrar);	
 	}
 
 	private static boolean conectar(String url, String usuario, String senha) {

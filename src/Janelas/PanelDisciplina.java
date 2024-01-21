@@ -1,6 +1,6 @@
 package janelas;
 
-// joaogabrielbz //
+//joaogabrielbz//
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,6 +46,11 @@ public class PanelDisciplina extends JPanel {
 	private JList<String> listDisciplinas;
 	private JButton btNovaDisciplina;
 	private JButton btRemoverDisciplina;
+	private JLabel lblVoltar;
+	private JLabel lblTitulo;
+	private JLabel lblNomeDisciplina;
+	private JLabel lblProfessorDisciplina;
+	private JButton btnAvancar;
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,7 +59,7 @@ public class PanelDisciplina extends JPanel {
 		this.janela = janela;
 		this.turno = turno;
 
-		JLabel lblVoltar = new JLabel("< Voltar ");
+		lblVoltar = new JLabel("< Voltar ");
 		lblVoltar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -78,7 +83,7 @@ public class PanelDisciplina extends JPanel {
 		lblVoltar.setFont(new Font("Noto Sans Light", Font.PLAIN, 16));
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
 
-		JLabel lblTitulo = new JLabel("Professores do turno " + turno.getNomeTurno() + ":");
+		lblTitulo = new JLabel("Professores do turno " + turno.getNomeTurno() + ":");
 		lblTitulo.setHorizontalAlignment(SwingConstants.LEFT);
 		lblTitulo.setForeground(new Color(136, 136, 136));
 		lblTitulo.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
@@ -86,7 +91,7 @@ public class PanelDisciplina extends JPanel {
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBackground(new Color(30, 30, 30));
 
-		JLabel lblNomeDisciplina = new JLabel("Nome da disciplina:");
+		lblNomeDisciplina = new JLabel("Nome da disciplina:");
 		lblNomeDisciplina.setHorizontalAlignment(SwingConstants.LEFT);
 		lblNomeDisciplina.setForeground(new Color(136, 136, 136));
 		lblNomeDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
@@ -105,7 +110,7 @@ public class PanelDisciplina extends JPanel {
 						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 							insertDisciplina(statement, turno, novaDisciplina);
 						} else {
-							alterarDisciplina(statement, novaDisciplina);
+							updateDisciplina(statement, novaDisciplina);
 						}
 						reiniciarLayout();
 					}
@@ -118,7 +123,7 @@ public class PanelDisciplina extends JPanel {
 		txtNomeDisciplina.setColumns(10);
 		txtNomeDisciplina.setBackground(new Color(45, 45, 45));
 
-		JLabel lblProfessorDisciplina = new JLabel("Nome do professor:");
+		lblProfessorDisciplina = new JLabel("Nome do professor:");
 		lblProfessorDisciplina.setHorizontalAlignment(SwingConstants.LEFT);
 		lblProfessorDisciplina.setForeground(new Color(136, 136, 136));
 		lblProfessorDisciplina.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
@@ -137,7 +142,7 @@ public class PanelDisciplina extends JPanel {
 						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 							insertDisciplina(statement, turno, novaDisciplina);
 						} else {
-							alterarDisciplina(statement, novaDisciplina);
+							updateDisciplina(statement, novaDisciplina);
 						}
 						reiniciarLayout();
 					}
@@ -164,7 +169,7 @@ public class PanelDisciplina extends JPanel {
 					if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 						insertDisciplina(statement, turno, novaDisciplina);
 					} else {
-						alterarDisciplina(statement, novaDisciplina);
+						updateDisciplina(statement, novaDisciplina);
 					}
 					reiniciarLayout();
 				}
@@ -188,22 +193,23 @@ public class PanelDisciplina extends JPanel {
 		btRemoverDisciplina.setBackground(new Color(172, 0, 9));
 		btRemoverDisciplina.setVisible(false);
 
-		JButton btnAvancar = new JButton("Avançar");
+		btnAvancar = new JButton("Avançar");
 		btnAvancar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// Lista todas as disciplinas e turmas de determinado turno//
 
 				ArrayList<Turma> turmas = new ArrayList<Turma>();
 				ArrayList<Disciplina> disciplinas = new ArrayList<Disciplina>();
 
 				String sql = "SELECT * FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno();
 				try {
-					ResultSet resultset = statement.executeQuery(sql);
-					while (resultset.next()) {
-						turmas.add(new Turma(resultset.getInt("idturma"), resultset.getString("nometurma"),
-								resultset.getInt("turnoid")));
+					ResultSet r = statement.executeQuery(sql);
+					while (r.next()) {
+						int idTurma = r.getInt("idTurma");
+						String nomeTurma = r.getString("nometurma");
+						int turnoId = r.getInt("turnoId");
 
+						turmas.add(new Turma(idTurma, nomeTurma, turnoId));
 					}
 				} catch (SQLException e1) {
 					e1.printStackTrace();
@@ -211,12 +217,14 @@ public class PanelDisciplina extends JPanel {
 
 				sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno();
 				try {
-					ResultSet resultset = statement.executeQuery(sql);
-					while (resultset.next()) {
-						disciplinas.add(
-								new Disciplina(resultset.getInt("iddisciplina"), resultset.getString("nomedisciplina"),
-										resultset.getString("professordisciplina"), resultset.getInt("turnoid")));
+					ResultSet r = statement.executeQuery(sql);
+					while (r.next()) {
+						int idDisciplina = r.getInt("idDisciplina");
+						String nomeDisciplina = r.getString("nomeDisciplina");
+						String professorDisciplina = r.getString("professorDisciplina");
+						int turnoId = r.getInt("turnoId");
 
+						disciplinas.add(new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, turnoId));
 					}
 				} catch (SQLException e1) {
 					e1.printStackTrace();
@@ -345,24 +353,26 @@ public class PanelDisciplina extends JPanel {
 		listDisciplinas.setModel(gerarListModelDisciplina(statement));
 	}
 
-	protected void alterarDisciplina(Statement statement, Disciplina novaDisciplina) {
-		String sql = "UPDATE classortbd.disciplina SET nomedisciplina='" + novaDisciplina.getNomeDisciplina() + "', "
-				+ "professordisciplina='" + novaDisciplina.getProfessorDisciplina() + "'" + "	WHERE idDisciplina = "
-				+ idDisciplinaSelecionada + ";";
-		try {
-			statement.execute(sql);
-			listDisciplinas.setModel(gerarListModelDisciplina(statement));
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+	public DefaultListModel<String> gerarListModelDisciplina(Statement statement) throws SQLException {
 
+		DefaultListModel<String> modelDisciplina = new DefaultListModel<String>();
+		idsDisciplinas = new ArrayList<Integer>();
+
+		String sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno() + "";
+		ResultSet r = statement.executeQuery(sql);
+
+		while (r.next()) {
+			String elemento = r.getString("nomeDisciplina") + " - " + r.getString("professorDisciplina");
+			modelDisciplina.addElement(elemento);
+			idsDisciplinas.add(r.getInt("idDisciplina"));
+		}
+		return modelDisciplina;
 	}
 
 	protected void insertDisciplina(Statement statement, Turno turno2, Disciplina novaDisciplina) {
 		boolean existe = false;
 		for (int i = 0; i != listDisciplinas.getModel().getSize(); i++) {
-			if (listDisciplinas.getModel().getElementAt(i)
-					.equals(novaDisciplina.getNomeCompleto())) {
+			if (listDisciplinas.getModel().getElementAt(i).equals(novaDisciplina.getNomeCompleto())) {
 				existe = true;
 			}
 		}
@@ -380,27 +390,17 @@ public class PanelDisciplina extends JPanel {
 
 	}
 
-	public DefaultListModel<String> gerarListModelDisciplina(Statement statement) throws SQLException {
-
-		DefaultListModel<String> modelDisciplina = new DefaultListModel<String>();
-		idsDisciplinas = new ArrayList<Integer>();
-
-		String sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno() + "";
-		ResultSet result = statement.executeQuery(sql);
-
-		while (result.next()) {
-			String elemento = result.getString("nomeDisciplina") + " - " + result.getString("professorDisciplina");
-			modelDisciplina.addElement(elemento);
-			idsDisciplinas.add(result.getInt("idDisciplina"));
+	protected void updateDisciplina(Statement statement, Disciplina novaDisciplina) {
+		String sql = "UPDATE classortbd.disciplina SET nomedisciplina='" + novaDisciplina.getNomeDisciplina() + "', "
+				+ "professordisciplina='" + novaDisciplina.getProfessorDisciplina() + "'" + "	WHERE idDisciplina = "
+				+ idDisciplinaSelecionada + ";";
+		try {
+			statement.execute(sql);
+			listDisciplinas.setModel(gerarListModelDisciplina(statement));
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
-		return modelDisciplina;
-	}
 
-	private void reiniciarLayout() {
-		btRemoverDisciplina.setVisible(false);
-		btNovaDisciplina.setText("Nova disciplina");
-		txtNomeDisciplina.setText("");
-		txtProfessorDisciplina.setText("");
 	}
 
 	private void deleteDisciplina(Statement statement) {
@@ -416,5 +416,12 @@ public class PanelDisciplina extends JPanel {
 			}
 			reiniciarLayout();
 		}
+	}
+
+	private void reiniciarLayout() {
+		btRemoverDisciplina.setVisible(false);
+		btNovaDisciplina.setText("Nova disciplina");
+		txtNomeDisciplina.setText("");
+		txtProfessorDisciplina.setText("");
 	}
 }

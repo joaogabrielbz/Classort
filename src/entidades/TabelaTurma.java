@@ -1,12 +1,16 @@
 package entidades;
 
-// joaogabrielbz //
+//joaogabrielbz//
 
-
-
-public class TabelaTurma {	
+public class TabelaTurma {
 	private Turma turma;
 	private String[][] matriz;
+
+	public TabelaTurma(Turma turma, String[][] matriz) {
+		super();
+		this.turma = turma;
+		this.matriz = matriz;
+	}
 
 	public Turma getTurma() {
 		return turma;
@@ -23,13 +27,4 @@ public class TabelaTurma {
 	public void setMatriz(String[][] matriz) {
 		this.matriz = matriz;
 	}
-
-	public TabelaTurma(Turma turma, String[][] matriz) {		
-		this.turma = turma;		
-		this.matriz = matriz;
-	}
-		
-	
-	
-	
 }
