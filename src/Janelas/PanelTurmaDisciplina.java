@@ -177,8 +177,9 @@ public class PanelTurmaDisciplina extends JPanel {
 						int indexClicado = listSelecionarDisciplinas.getSelectedIndex();
 						int idDisciplinaClicada = disciplinasNaoSelecionadas.get(indexClicado).getIdDisciplina();
 
-						String sql = "INSERT INTO classortbd.turma_disciplina (qtdAulas, turmaId, disciplinaId) VALUES "
-								+ "( 1, " + turmas.get(indexTurma).getIdTurma() + ", " + idDisciplinaClicada + ");";
+						String sql = "INSERT INTO classortbd.turma_disciplina (qtdAulas, turmaId, disciplinaId, turnoId) VALUES "
+								+ "( 1, " + turmas.get(indexTurma).getIdTurma() + ", " + idDisciplinaClicada + ", "
+								+ turno.getIdTurno() + ");";
 						try {
 							statement.execute(sql);
 							carregarDisciplinas(statement);
@@ -271,7 +272,7 @@ public class PanelTurmaDisciplina extends JPanel {
 					}
 
 					telaRevisao = new TelaRevisao(statement, janela, panelturmadisciplina, turmas, disciplinas,
-							maxAulas, horarios, semana);
+							maxAulas, horarios, semana, turno);
 					telaRevisao.setResizable(false);
 					telaRevisao.setLocationRelativeTo(janela);
 					telaRevisao.setVisible(true);
@@ -488,7 +489,7 @@ public class PanelTurmaDisciplina extends JPanel {
 			}
 
 			Collections.sort(disciplinasNaoSelecionadas, Comparator.comparing(Disciplina::getNomeDisciplina));
-			
+
 			for (Disciplina d : disciplinasNaoSelecionadas) {
 				modelDisciplinasNaoSelecionadas.addElement(d.getNomeCompleto());
 			}

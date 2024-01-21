@@ -48,8 +48,10 @@ CREATE TABLE classortbd.turma_disciplina (
     qtdAulas INT,
     turmaId INT,
     disciplinaId INT,
+    turnoId INT,
     FOREIGN KEY (turmaId) REFERENCES classortbd.turma(idTurma),
-    FOREIGN KEY (disciplinaId) REFERENCES classortbd.disciplina(idDisciplina)
+    FOREIGN KEY (disciplinaId) REFERENCES classortbd.disciplina(idDisciplina),
+    FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
 

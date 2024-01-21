@@ -11,6 +11,8 @@ import entidades.Disciplina;
 import entidades.Horario;
 import entidades.Semana;
 import entidades.Turma;
+import entidades.Turno;
+
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +47,9 @@ public class TelaRevisao extends JDialog {
 	private JPanel panelTurmas;
 	private JLabel lblDica;
 
+	private int maxAulasTurmas = 0;
+	private int maxAulasDisciplinas = 0;
+
 	private TelaRevisao telaRevisao = this;
 
 	private static final long serialVersionUID = 1L;
@@ -56,10 +61,12 @@ public class TelaRevisao extends JDialog {
 
 	public TelaRevisao(Statement statement, TelaInicial janela, PanelTurmaDisciplina panelturmadisciplina,
 			ArrayList<Turma> turmas, ArrayList<Disciplina> disciplinas, int maxAulas, ArrayList<Horario> horarios,
-			Semana semana) {
+			Semana semana, Turno turno) {
 
 		this.horarios = horarios;
 		this.semana = semana;
+		this.maxAulasTurmas = maxAulas;
+		this.maxAulasDisciplinas = (int) (maxAulas * 0.6666) ;
 
 		setModal(true);
 
@@ -105,7 +112,8 @@ public class TelaRevisao extends JDialog {
 				if (btAvancar.getText() == "Avançar") {
 					TelaHorariosGerados telahorariosgerados;
 					try {
-						telahorariosgerados = new TelaHorariosGerados(statement, disciplinas, turmas, horarios, semana);
+						telahorariosgerados = new TelaHorariosGerados(statement, disciplinas, turmas, horarios, semana,
+								turno);
 						telahorariosgerados.setLocationRelativeTo(janela);
 						telaRevisao.dispose();
 						telahorariosgerados.setVisible(true);
@@ -146,9 +154,9 @@ public class TelaRevisao extends JDialog {
 			int aulasTotais = d.getAulasTotais();
 
 			String disicplina = d.getNomeCompleto();
-			String aulas = aulasTotais + "/" + maxAulas;
+			String aulas = aulasTotais + "/" + maxAulasDisciplinas;
 
-			if (aulasTotais > maxAulas) {
+			if (aulasTotais > maxAulasDisciplinas) {
 				haAulasAMais = true;
 			}
 
@@ -214,12 +222,12 @@ public class TelaRevisao extends JDialog {
 			int aulasTotais = t.getAulasTotais();
 
 			String turma = t.getNomeTurma();
-			String aulas = aulasTotais + "/" + maxAulas;
+			String aulas = aulasTotais + "/" + maxAulasTurmas;
 
-			if (aulasTotais > maxAulas) {
+			if (aulasTotais > maxAulasTurmas) {
 				haAulasAMais = true;
 			}
-			if (aulasTotais < maxAulas) {
+			if (aulasTotais < maxAulasTurmas) {
 				haAulasAMenos = true;
 			}
 
@@ -232,7 +240,7 @@ public class TelaRevisao extends JDialog {
 			lblDica.setText("Aviso: uma ou mais turmas terão aulas vagas");
 			lblDica.setVisible(true);
 		}
-		if (!haAulasAMais) {			
+		if (!haAulasAMais) {
 			btAvancar.setText("Avançar");
 		} else {
 			lblDica.setForeground(Color.red);
@@ -254,10 +262,9 @@ public class TelaRevisao extends JDialog {
 
 			String aulas = (String) table.getValueAt(row, 1);
 			String[] partes = aulas.split("/");
-			int aulasTotais = Integer.parseInt(partes[0]);
-			int maxAulas = Integer.parseInt(partes[1]);
+			int aulasTotais = Integer.parseInt(partes[0]);			
 
-			if (aulasTotais > maxAulas) {
+			if (aulasTotais > maxAulasDisciplinas) {
 				rendererComponent.setForeground(Color.red);
 			} else {
 				rendererComponent.setBackground(table.getBackground());
@@ -278,12 +285,11 @@ public class TelaRevisao extends JDialog {
 
 			String aulas = (String) table.getValueAt(row, 1);
 			String[] partes = aulas.split("/");
-			int aulasTotais = Integer.parseInt(partes[0]);
-			int maxAulas = Integer.parseInt(partes[1]);
+			int aulasTotais = Integer.parseInt(partes[0]);			
 
-			if (aulasTotais > maxAulas) {
+			if (aulasTotais > maxAulasTurmas) {
 				rendererComponent.setForeground(Color.red);
-			} else if (aulasTotais < maxAulas) {
+			} else if (aulasTotais < maxAulasTurmas) {
 				rendererComponent.setForeground(new Color(255, 255, 51));
 			} else {
 				rendererComponent.setBackground(table.getBackground());
