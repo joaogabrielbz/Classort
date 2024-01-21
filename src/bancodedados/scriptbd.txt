@@ -77,3 +77,32 @@ INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES
     (TIME '14:10:00', TIME '15:00:00', 2),
     (TIME '15:20:00', TIME '16:10:00', 2),
     (TIME '16:10:00', TIME '17:00:00', 2);
+    
+INSERT INTO classortbd.turma (nomeTurma, turnoId)
+VALUES 
+    ('5ºV01', 2),
+    ('5ºV02', 2),
+    ('5ºV03', 2),
+    ('6ºV01', 2),
+    ('6ºV02', 2),
+    ('6ºV03', 2),
+    ('7ºV01', 2),
+    ('7ºV02', 2),
+    ('7ºV03', 2),
+    ('8ºV01', 2),
+    ('8ºV02', 2),
+    ('8ºV03', 2),
+    ('9ºV01', 2),
+    ('9ºV02', 2),
+    ('9ºV03', 2);
+    
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId)
+VALUES 
+    ('Matemática', 'João Silva', 2),
+    ('Português', 'Maria Oliveira', 2),
+    ('Ciências', 'Carlos Santos', 2),
+    ('História', 'Ana Pereira', 2),
+    ('Geografia', 'Pedro Rocha', 2),
+    ('Inglês', 'Mariana Costa', 2),
+    ('Artes', 'Roberto Almeida', 2),
+    ('Educação Física', 'Isabel Ramos', 2);

@@ -7,6 +7,7 @@ public class TurmaDisciplina {
 	private int qtdAulas;
 	private int TurmaId;
 	private int DisciplinaId;
+	private String nomeCompletoDisciplina;
 
 	public TurmaDisciplina(int idTurmaDisciplina, int qtdAulas, int turmaId, int disciplinaId) {
 		super();
@@ -14,6 +15,14 @@ public class TurmaDisciplina {
 		this.qtdAulas = qtdAulas;
 		TurmaId = turmaId;
 		DisciplinaId = disciplinaId;
+	}
+
+	public String getNomeCompletoDisciplina() {
+		return nomeCompletoDisciplina;
+	}
+
+	public void setNomeCompletoDisciplina(String nomeCompletoDisciplina) {
+		this.nomeCompletoDisciplina = nomeCompletoDisciplina;
 	}
 
 	public int getIdTurmaDisciplina() {

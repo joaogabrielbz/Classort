@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -247,15 +249,27 @@ public class PanelTurma extends JPanel {
 		DefaultListModel<String> modelTurma = new DefaultListModel<String>();
 		idsTurmas = new ArrayList<Integer>();
 
-		String sql = "SELECT * FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno() + "";
+		String sql = "SELECT idTurma, nomeTurma FROM classortbd.turma WHERE turnoid = " + turno.getIdTurno() + "";
 		ResultSet r = statement.executeQuery(sql);
-
-		while (r.next()) {
-			modelTurma.addElement(r.getString("nomeTurma"));
-			idsTurmas.add(r.getInt("idTurma"));
+		
+		ArrayList<Turma> temp = new ArrayList<Turma>();
+		while(r.next()) {
+			int idTurma = r.getInt("idTurma");
+			String nomeTurma = r.getString("nomeTurma");
+						
+			temp.add(new Turma(idTurma,nomeTurma,turno.getIdTurno()));
 		}
+		
+		Collections.sort(temp, Comparator.comparing(Turma::getNomeTurma));
+		
+		for(Turma t : temp) {
+			modelTurma.addElement(t.getNomeTurma());
+			idsTurmas.add(t.getIdTurma());
+		}		
 		return modelTurma;
 	}
+	
+	
 
 	private void insertTurma(Statement statement, Turno turno, Turma novaTurma) {
 
@@ -303,6 +317,7 @@ public class PanelTurma extends JPanel {
 			reiniciarLayout();
 		}
 	}
+	
 	
 	private void reiniciarLayout() {
 		btRemoverTurma.setVisible(false);

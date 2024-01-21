@@ -9,6 +9,9 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import javax.swing.GroupLayout.Alignment;
 import entidades.Disciplina;
 import entidades.Horario;
@@ -143,6 +146,11 @@ public class PanelTurmaDisciplina extends JPanel {
 					btGerarHorario.setText("Remover");
 					btGerarHorario.setBackground(new Color(172, 0, 9));
 				}
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				salvarQtdAulas(statement);
 			}
 		});
 		tableDisciplinasSelecionadas.setForeground(new Color(255, 255, 255));
@@ -441,14 +449,21 @@ public class PanelTurmaDisciplina extends JPanel {
 				int qtdAulas = r.getInt("qtdAulas");
 				int turmaId = r.getInt("turmaId");
 				int disciplinaId = r.getInt("disciplinaId");
+				String nomeDisciplina = r.getString("nomeDisciplina");
+				String professorDisciplina = r.getString("professorDisciplina");
+
 				TurmaDisciplina novaTurmaDisciplina = new TurmaDisciplina(idTurmaDiscipina, qtdAulas, turmaId,
 						disciplinaId);
-				turmadisciplinas.add(novaTurmaDisciplina);
+				novaTurmaDisciplina.setNomeCompletoDisciplina(nomeDisciplina + " - " + professorDisciplina);
 
-				String disciplinaEProfessor = r.getString("nomeDisciplina") + " - "
-						+ r.getString("professorDisciplina");
-				modelDisciplinasSelecionadas.addRow(new Object[] { disciplinaEProfessor, qtdAulas });
+				turmadisciplinas.add(novaTurmaDisciplina);
 			}
+			Collections.sort(turmadisciplinas, Comparator.comparing(TurmaDisciplina::getNomeCompletoDisciplina));
+
+			for (TurmaDisciplina td : turmadisciplinas) {
+				modelDisciplinasSelecionadas.addRow(new Object[] { td.getNomeCompletoDisciplina(), td.getQtdAulas() });
+			}
+
 			tableDisciplinasSelecionadas.setModel(modelDisciplinasSelecionadas);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(0).setPreferredWidth(215);
 			tableDisciplinasSelecionadas.getColumnModel().getColumn(1).setPreferredWidth(25);
@@ -469,8 +484,13 @@ public class PanelTurmaDisciplina extends JPanel {
 				}
 				if (!estaSelecionada) {
 					disciplinasNaoSelecionadas.add(disciplinas.get(i));
-					modelDisciplinasNaoSelecionadas.addElement(disciplinas.get(i).getNomeCompleto());
 				}
+			}
+
+			Collections.sort(disciplinasNaoSelecionadas, Comparator.comparing(Disciplina::getNomeDisciplina));
+			
+			for (Disciplina d : disciplinasNaoSelecionadas) {
+				modelDisciplinasNaoSelecionadas.addElement(d.getNomeCompleto());
 			}
 			listSelecionarDisciplinas.setModel(modelDisciplinasNaoSelecionadas);
 		}

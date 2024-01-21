@@ -6,6 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import entidades.Disciplina;
@@ -224,13 +227,16 @@ public class PanelDisciplina extends JPanel {
 						String professorDisciplina = r.getString("professorDisciplina");
 						int turnoId = r.getInt("turnoId");
 
+						
+						
 						disciplinas.add(new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, turnoId));
 					}
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
 
-				try {
+				Collections.sort(turmas, Comparator.comparing(Turma::getNomeTurma));
+				try {								
 					janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas,
 							disciplinas);
 				} catch (SQLException e1) {
@@ -361,11 +367,22 @@ public class PanelDisciplina extends JPanel {
 		String sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno() + "";
 		ResultSet r = statement.executeQuery(sql);
 
+		ArrayList<Disciplina> temp = new ArrayList<Disciplina>();
 		while (r.next()) {
-			String elemento = r.getString("nomeDisciplina") + " - " + r.getString("professorDisciplina");
-			modelDisciplina.addElement(elemento);
-			idsDisciplinas.add(r.getInt("idDisciplina"));
+			int idDisciplina = r.getInt("idDisciplina");
+			String nomeDisciplina = r.getString("nomeDisciplina");
+			String professorDisciplina = r.getString("professorDisciplina");
+			
+			temp.add(new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, turno.getIdTurno()));
 		}
+		
+		Collections.sort(temp, Comparator.comparing(Disciplina::getNomeDisciplina));
+
+		for(Disciplina d : temp) {			
+			modelDisciplina.addElement(d.getNomeCompleto());
+			idsDisciplinas.add(d.getIdDisciplina());
+		}
+
 		return modelDisciplina;
 	}
 

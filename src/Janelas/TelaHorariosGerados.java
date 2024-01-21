@@ -4,7 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -13,12 +15,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import entidades.Coordenada;
 import entidades.Disciplina;
 import entidades.Horario;
 import entidades.Semana;
 import entidades.TabelaDisciplina;
 import entidades.TabelaTurma;
 import entidades.Turma;
+import entidades.TurmaDisciplina;
 import java.awt.Color;
 import java.awt.Toolkit;
 import javax.swing.ListSelectionModel;
@@ -31,24 +36,26 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
 
-
 public class TelaHorariosGerados extends JDialog {
 
+	private ArrayList<TurmaDisciplina> turmadisciplinas;;
 	private ArrayList<TabelaTurma> tabelaturmas;
 	private ArrayList<TabelaDisciplina> tabeladisciplinas;
+
+	Random rand = new Random();
 
 	private int aulasPorDia = 0;
 	private int aulasPorSemana = 0;
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private JPanel contentPane;
 	private JTabbedPane tpTurmaOuDisciplina;
 	private JPanel panelTurmas;
 	private JPanel panelDisciplina;
 	private JTabbedPane tpTurmas;
 	private JTabbedPane tpDisciplinas;
-	
+
 	static {
 		UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
 	}
@@ -64,7 +71,7 @@ public class TelaHorariosGerados extends JDialog {
 		setModal(true);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 850, 510);
+		setBounds(100, 100, 950, 550);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(30, 30, 30));
 		contentPane.setForeground(new Color(30, 30, 30));
@@ -162,15 +169,97 @@ public class TelaHorariosGerados extends JDialog {
 		// Sorteando horarios //
 		String sql = "SELECT * FROM classortbd.turma_disciplina";
 		ResultSet r = statement.executeQuery(sql);
-		
-		
-		
+
+		turmadisciplinas = new ArrayList<TurmaDisciplina>();
+		while (r.next()) {
+			int idTurmaDisciplina = r.getInt("idTurmaDisciplina");
+			int qtdAulas = r.getInt("qtdAulas");
+			int TurmaId = r.getInt("TurmaId");
+			int DisciplinaId = r.getInt("DisciplinaId");
+
+			turmadisciplinas.add(new TurmaDisciplina(idTurmaDisciplina, qtdAulas, TurmaId, DisciplinaId));
+		}
+
+		Collections.sort(turmadisciplinas, new Comparator<TurmaDisciplina>() {
+			@Override
+			public int compare(TurmaDisciplina td1, TurmaDisciplina td2) {
+				return Integer.compare(td2.getQtdAulas(), td1.getQtdAulas());
+			}
+		});
+
+		for (TurmaDisciplina turmadisciplina : turmadisciplinas) {
+			int quantidade = turmadisciplina.getQtdAulas();
+			TabelaDisciplina td = null;
+			TabelaTurma tt = null;
+			int indexTabelaDisciplina = 0;
+			int indexTabelaTurma = 0;
+
+			// Coletando tabeladisciplina correta e seu index //
+			for (TabelaDisciplina temp : tabeladisciplinas) {
+				if (temp.getDisciplina().getIdDisciplina() == turmadisciplina.getDisciplinaId()) {
+					td = temp;
+					break;
+				} else {
+					indexTabelaDisciplina++;
+				}
+			}
+
+			// Coletando tabelaturma correta e seu index //
+			for (TabelaTurma temp : tabelaturmas) {
+				if (temp.getTurma().getIdTurma() == turmadisciplina.getTurmaId()) {
+					tt = temp;
+					break;
+				} else {
+					indexTabelaTurma++;
+				}
+			}
+
+			// Inserindo de acordo com a quantidade de aulas //
+			for (int x = 0; x < quantidade; x++) {
+				int i = 1;
+				int j = 1;
+
+				ArrayList<Coordenada> tentativas = new ArrayList<Coordenada>();
+				while (true) {
+					i = rand.nextInt(tt.getMatriz().length - 1) + 1;
+					j = rand.nextInt(tt.getMatriz()[0].length - 1) + 1;
+
+					boolean jaTentou = false;
+
+					Coordenada temp = new Coordenada(i, j);
+					for (Coordenada c : tentativas) {
+						if (c.i == temp.i && c.j == temp.j) {
+							jaTentou = true;
+							break;
+						}
+					}
+
+					if (!jaTentou) {
+						tentativas.add(temp);
+						if (tentativas.size() != aulasPorDia * aulasPorSemana) {
+							if (tt.getMatriz()[i][j] == null) {
+								if (td.getMatriz()[i][j] == null) {
+									tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+									td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+									break;
+								}
+							}
+						}
+						else {
+							//TODO não tem mais espaços, começar logica de fazer trocas
+							break;
+						}
+					}
+				}
+			}
+		}
 
 		// Criando JTables e exibindo turmas //
 		for (TabelaTurma tt : tabelaturmas) {
 			DefaultTableModel model = new DefaultTableModel(tt.getMatriz(), tt.getMatriz()[0]);
 			JTable table = new JTable(model) {
 				private static final long serialVersionUID = 1L;
+
 				@Override
 				public boolean isCellEditable(int row, int column) {
 					return false;
@@ -199,12 +288,13 @@ public class TelaHorariosGerados extends JDialog {
 			String nomeTurma = tt.getTurma().getNomeTurma();
 			tpTurmas.addTab(nomeTurma, scrollPane);
 		}
-		
+
 		// Criando JTables e exibindo disciplinas //
 		for (TabelaDisciplina td : tabeladisciplinas) {
 			DefaultTableModel model = new DefaultTableModel(td.getMatriz(), td.getMatriz()[0]);
 			JTable table = new JTable(model) {
 				private static final long serialVersionUID = 1L;
+
 				@Override
 				public boolean isCellEditable(int row, int column) {
 					return false;
