@@ -74,6 +74,7 @@ public class PanelTurmaDisciplina extends JPanel {
 	private Semana semana;
 
 	private static final long serialVersionUID = 1L;
+	private JTextField txtPesquisa;
 
 	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas,
 			ArrayList<Disciplina> disciplinas) throws SQLException {
@@ -163,6 +164,27 @@ public class PanelTurmaDisciplina extends JPanel {
 		scrollPaneNaoSelecionadas = new JScrollPane();
 
 		listSelecionarDisciplinas = new JList<String>();
+		listSelecionarDisciplinas.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (listSelecionarDisciplinas.getSelectedIndex() != -1) {
+						int indexClicado = listSelecionarDisciplinas.getSelectedIndex();
+						int idDisciplinaClicada = disciplinasNaoSelecionadas.get(indexClicado).getIdDisciplina();
+
+						String sql = "INSERT INTO classortbd.turma_disciplina (qtdAulas, turmaId, disciplinaId, turnoId) VALUES "
+								+ "( 1, " + turmas.get(indexTurma).getIdTurma() + ", " + idDisciplinaClicada + ", "
+								+ turno.getIdTurno() + ");";
+						try {
+							statement.execute(sql);
+							carregarDisciplinas(statement);
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			}
+		});
 		listSelecionarDisciplinas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -203,7 +225,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblTitulo.setForeground(new Color(136, 136, 136));
 		lblTitulo.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
 
-		JLabel lblInstrucao = new JLabel("Clique para adicionar:");
+		JLabel lblInstrucao = new JLabel("Adicionar:");
 		lblInstrucao.setHorizontalAlignment(SwingConstants.LEFT);
 		lblInstrucao.setForeground(new Color(136, 136, 136));
 		lblInstrucao.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
@@ -282,34 +304,69 @@ public class PanelTurmaDisciplina extends JPanel {
 		btGerarHorario.setForeground(Color.WHITE);
 		btGerarHorario.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
 		btGerarHorario.setBackground(new Color(60, 60, 60));
+
+		txtPesquisa = new JTextField();
+		txtPesquisa.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				String pesquisa = txtPesquisa.getText();
+				char keyChar = e.getKeyChar();
+				if (Character.isLetter(keyChar) || Character.isDigit(keyChar)) {
+					pesquisa = pesquisa + keyChar;
+				}
+
+				if (pesquisa.isEmpty()) {
+					try {
+						carregarDisciplinas(statement);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					try {
+						carregarDisciplinas(statement);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					ArrayList<Disciplina> temp = new ArrayList<Disciplina>();
+
+					for (int i = 0; i < disciplinasNaoSelecionadas.size(); i++) {
+						if (disciplinasNaoSelecionadas.get(i).getNomeCompleto().toLowerCase().contains(pesquisa.toLowerCase())) {
+							temp.add(disciplinasNaoSelecionadas.get(i));
+						}
+					}
+					disciplinasNaoSelecionadas = temp;
+
+					DefaultListModel<String> listModel = new DefaultListModel<String>();
+					for (Disciplina d : disciplinasNaoSelecionadas) {
+						listModel.addElement(d.getNomeCompleto());
+					}
+					listSelecionarDisciplinas.setModel(listModel);
+				}
+			}
+
+		});
+		txtPesquisa.setForeground(Color.WHITE);
+		txtPesquisa.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		txtPesquisa.setColumns(10);
+		txtPesquisa.setBackground(new Color(45, 45, 45));
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup().addGap(10).addComponent(lblVoltar,
+						GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE))
+				.addGroup(groupLayout.createSequentialGroup().addGap(67)
+						.addComponent(lblTitulo, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE).addGap(22)
+						.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE).addGap(69))
+				.addGroup(groupLayout.createSequentialGroup().addGap(67)
+						.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE).addGap(18)
 						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addGroup(groupLayout.createSequentialGroup().addContainerGap()
-										.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 60,
-												GroupLayout.PREFERRED_SIZE)
-										.addGap(0))
-								.addGroup(groupLayout.createSequentialGroup().addGap(67)
-										.addComponent(lblTitulo, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-										.addGap(22)
-										.addComponent(lblInstrucao, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
-								.addGroup(groupLayout.createSequentialGroup().addGap(67)
-										.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-												.addGroup(groupLayout.createSequentialGroup()
-														.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE,
-																325, Short.MAX_VALUE)
-														.addGap(18).addComponent(scrollPaneNaoSelecionadas,
-																GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
-												.addGroup(groupLayout.createSequentialGroup()
-														.addComponent(btVoltarTurma, GroupLayout.PREFERRED_SIZE, 137,
-																GroupLayout.PREFERRED_SIZE)
-														.addGap(120)
-														.addComponent(btGerarHorario, GroupLayout.DEFAULT_SIZE, 150,
-																Short.MAX_VALUE)
-														.addGap(120).addComponent(btAvancarTurma,
-																GroupLayout.PREFERRED_SIZE, 137,
-																GroupLayout.PREFERRED_SIZE)))))
+								.addComponent(txtPesquisa, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE).addComponent(
+										scrollPaneNaoSelecionadas, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+						.addGap(69))
+				.addGroup(groupLayout.createSequentialGroup().addGap(67)
+						.addComponent(btVoltarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+						.addGap(120).addComponent(btGerarHorario, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+						.addGap(120)
+						.addComponent(btAvancarTurma, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
 						.addGap(69)));
 		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup().addGap(20)
@@ -317,16 +374,20 @@ public class PanelTurmaDisciplina extends JPanel {
 						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblInstrucao, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-						.addGroup(
-								groupLayout.createParallelGroup(Alignment.LEADING)
-										.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246,
-												Short.MAX_VALUE)
-										.addComponent(scrollPaneNaoSelecionadas, GroupLayout.DEFAULT_SIZE, 246,
-												Short.MAX_VALUE))
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(scrollPaneSelecionadas, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+								.addGroup(Alignment.TRAILING,
+										groupLayout.createSequentialGroup()
+												.addComponent(txtPesquisa, GroupLayout.PREFERRED_SIZE, 25,
+														GroupLayout.PREFERRED_SIZE)
+												.addGap(2).addComponent(scrollPaneNaoSelecionadas,
+														GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)))
 						.addGap(35)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btVoltarTurma)
-								.addComponent(btAvancarTurma).addComponent(btGerarHorario, GroupLayout.PREFERRED_SIZE,
-										25, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(btVoltarTurma))
+								.addComponent(btGerarHorario, GroupLayout.PREFERRED_SIZE, 25,
+										GroupLayout.PREFERRED_SIZE)
+								.addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(btAvancarTurma)))
 						.addGap(50)));
 		setLayout(groupLayout);
 
