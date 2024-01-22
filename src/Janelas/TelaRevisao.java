@@ -66,7 +66,7 @@ public class TelaRevisao extends JDialog {
 		this.horarios = horarios;
 		this.semana = semana;
 		this.maxAulasTurmas = maxAulas;
-		this.maxAulasDisciplinas = (int) (maxAulas *0.6666) ;
+		this.maxAulasDisciplinas = maxAulas ;
 
 		setModal(true);
 

@@ -2,6 +2,8 @@ CREATE SCHEMA classortbd;
 
 /* joaogabrielbz */
 
+/* Criando tabelas */
+
 CREATE TABLE classortbd.turno (
     idTurno SERIAL PRIMARY KEY,
     nomeTurno VARCHAR(100) NOT NULL
@@ -54,17 +56,25 @@ CREATE TABLE classortbd.turma_disciplina (
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
-
+/* Inserindo turnos */
 
 INSERT INTO classortbd.turno (nomeTurno) VALUES 
     ('Matutino'),
-    ('Vespertino');
+    ('Vespertino - Fundamental (1)'),
+    ('Vespertino - Fundamental (2)');    
+
+/* Inserindo semanas por turno */
 
 INSERT INTO classortbd.semana (segunda, terca, quarta, quinta, sexta, sabado, domingo, turnoId)
 VALUES (TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, 1);
 
 INSERT INTO classortbd.semana (segunda, terca, quarta, quinta, sexta, sabado, domingo, turnoId)
 VALUES (TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, 2);
+
+INSERT INTO classortbd.semana (segunda, terca, quarta, quinta, sexta, sabado, domingo, turnoId)
+VALUES (TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, 3);
+
+/* Inserindo horarios por turno */
 
 INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES 
     (TIME '07:10:00', TIME '08:00:00', 1),
@@ -80,31 +90,53 @@ INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES
     (TIME '15:20:00', TIME '16:10:00', 2),
     (TIME '16:10:00', TIME '17:00:00', 2);
     
-INSERT INTO classortbd.turma (nomeTurma, turnoId)
-VALUES 
-    ('5ºV01', 2),
-    ('5ºV02', 2),
-    ('5ºV03', 2),
-    ('6ºV01', 2),
-    ('6ºV02', 2),
-    ('6ºV03', 2),
-    ('7ºV01', 2),
-    ('7ºV02', 2),
-    ('7ºV03', 2),
-    ('8ºV01', 2),
-    ('8ºV02', 2),
-    ('8ºV03', 2),
-    ('9ºV01', 2),
-    ('9ºV02', 2),
-    ('9ºV03', 2);
+INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES 
+    (TIME '12:30:00', TIME '13:20:00', 3),
+    (TIME '13:20:00', TIME '14:10:00', 3),
+    (TIME '14:10:00', TIME '15:00:00', 3),
+    (TIME '15:20:00', TIME '16:10:00', 3),
+    (TIME '16:10:00', TIME '17:00:00', 3);
     
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId)
-VALUES 
-    ('Matemática', 'João Silva', 2),
-    ('Português', 'Maria Oliveira', 2),
-    ('Ciências', 'Carlos Santos', 2),
-    ('História', 'Ana Pereira', 2),
-    ('Geografia', 'Pedro Rocha', 2),
-    ('Inglês', 'Mariana Costa', 2),
-    ('Artes', 'Roberto Almeida', 2),
-    ('Educação Física', 'Isabel Ramos', 2);
+/* inserindo itens default do turno (1) */
+
+
+/* inserindo itens default do turno (2) */   
+
+
+/* inserindo itens default do turno (3) */
+    
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Arte', 'DT1', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Arte', 'DT2', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'Andréia', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'Juliana', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'DT1', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'DT2', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ed Física', 'DT1', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Matemática', 'Wanderson', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Matemática', 'Thiago', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Matemática', 'DT1', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ciências', 'Viviâne', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ciência ', 'DT1', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Geografia', 'Valério', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Geografia', 'Wallace', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('História', 'Agenor', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('História', 'DT2', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ed Física', 'DT2', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ens religioso', 'Agenor', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Inglês', 'Leilane', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('História', 'DT1', 3);
+
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('6v2', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('6v3', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('6v4', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('6v1', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('7v1', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('7v2', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('7v3', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('8v1', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('8v2', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('8v3', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('9v1', 3);
+INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('9v2', 3);
+
+
