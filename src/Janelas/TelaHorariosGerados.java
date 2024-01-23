@@ -28,6 +28,11 @@ import entidades.Turno;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -43,6 +48,7 @@ public class TelaHorariosGerados extends JDialog {
 
 	private ArrayList<TurmaDisciplina> turmadisciplinas;;
 	private ArrayList<Tabelas> listTabelas = new ArrayList<Tabelas>();
+	private ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
 
 	Random rand = new Random();
 
@@ -61,13 +67,14 @@ public class TelaHorariosGerados extends JDialog {
 	private ArrayList<Turma> turmas;
 	private ArrayList<Disciplina> disciplinas;
 	private ArrayList<Horario> horarios;
+	private TelaErros telaerro;
 
 	static {
 		UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
 	}
 
-	public TelaHorariosGerados(Statement statement, ArrayList<Disciplina> disciplinas, ArrayList<Turma> turmas,
-			ArrayList<Horario> horarios, Semana semana, Turno turno) throws SQLException {
+	public TelaHorariosGerados(Statement statement, TelaInicial janela, ArrayList<Disciplina> disciplinas,
+			ArrayList<Turma> turmas, ArrayList<Horario> horarios, Semana semana, Turno turno) throws SQLException {
 		this.aulasPorDia = horarios.size();
 		this.aulasPorSemana = semana.getQtdDias();
 		this.turmas = turmas;
@@ -77,7 +84,6 @@ public class TelaHorariosGerados extends JDialog {
 		setTitle("Classort");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaHorariosGerados.class.getResource("/imgs/icon.png")));
 		setBackground(new Color(30, 30, 30));
-		setModal(true);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1150, 650);
@@ -86,17 +92,25 @@ public class TelaHorariosGerados extends JDialog {
 		contentPane.setForeground(new Color(30, 30, 30));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		setContentPane(contentPane);
-		contentPane.setLayout(null);	
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if (telaerro != null) {
+					telaerro.dispose();
+				}
+			}
+		});
 
-		if (!gerarTela(statement, disciplinas, turmas, horarios, turno)) {
-			JLabel lblNoExistemHorarios = new JLabel("Não existem horarios possíveis");
-			lblNoExistemHorarios.setBounds(this.getWidth() - lblNoExistemHorarios.getWidth() / 2,
-					this.getHeight() - lblNoExistemHorarios.getHeight() / 2, 334, 41);
-			lblNoExistemHorarios.setHorizontalAlignment(SwingConstants.CENTER);
-			lblNoExistemHorarios.setForeground(new Color(136, 136, 136));
-			lblNoExistemHorarios.setFont(new Font("Noto Sans Light", Font.PLAIN, 18));
-			contentPane.add(lblNoExistemHorarios);
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		setModal(true);
+
+		if (gerarTela(statement, disciplinas, turmas, horarios, turno)) {
+			if (realocacoes.size() > 0) {
+				telaerro = new TelaErros(this, realocacoes);
+				telaerro.setVisible(true);
+				telaerro.setAlwaysOnTop(true);
+			}
 		}
 	}
 
@@ -172,7 +186,8 @@ public class TelaHorariosGerados extends JDialog {
 			});
 
 			// Gerando horarios e pegando o com menos realocacoes//
-			for (int i = 0; i < 35000; i++) {
+			int max = 35000;
+			for (int i = 0; i < max; i++) {
 				listTabelas.add(gerarTabelas());
 				if (listTabelas.get(listTabelas.size() - 1).realocacoes.size() == 0) {
 					break;
@@ -183,17 +198,19 @@ public class TelaHorariosGerados extends JDialog {
 			Collections.sort(listTabelas, Comparator.comparingInt(tabelas -> tabelas.realocacoes.size()));
 			tabelaturmas = listTabelas.get(0).tabelaturmas;
 			tabeladisciplinas = listTabelas.get(0).tabeladisciplinas;
+			ArrayList<Realocacao> temp = listTabelas.get(0).realocacoes;		
+			
+			if (listTabelas.size() == max) {
+				realocacoes = temp;				
+			}
 			listTabelas.clear();
 
-		}
-
-		if (listTabelas.size() == 35000) {
-			return false;
 		}
 
 		// Criando JTables e exibindo turmas //
 		exibirTabelas(tabelaturmas, tabeladisciplinas);
 		return true;
+
 	}
 
 	private void exibirTabelas(ArrayList<TabelaTurma> tabelaturmas, ArrayList<TabelaDisciplina> tabeladisciplinas) {
@@ -235,6 +252,7 @@ public class TelaHorariosGerados extends JDialog {
 		for (TabelaDisciplina td : tabeladisciplinas) {
 			DefaultTableModel model = new DefaultTableModel(td.getMatriz(), td.getMatriz()[0]);
 			JTable table = new JTable(model) {
+
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -248,6 +266,7 @@ public class TelaHorariosGerados extends JDialog {
 			table.setBackground(new Color(45, 45, 45));
 			table.getTableHeader().setUI(null);
 			table.setRowHeight(80);
+
 			DefaultTableCellRenderer centralizar = new DefaultTableCellRenderer();
 			centralizar.setHorizontalAlignment(JLabel.CENTER);
 			for (int i = 0; i < table.getColumnCount(); i++) {

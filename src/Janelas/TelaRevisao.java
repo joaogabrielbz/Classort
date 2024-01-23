@@ -112,7 +112,7 @@ public class TelaRevisao extends JDialog {
 				if (btAvancar.getText() == "Avançar") {
 					TelaHorariosGerados telahorariosgerados;
 					try {
-						telahorariosgerados = new TelaHorariosGerados(statement, disciplinas, turmas, horarios, semana,
+						telahorariosgerados = new TelaHorariosGerados(statement, janela, disciplinas, turmas, horarios, semana,
 								turno);
 						telahorariosgerados.setLocationRelativeTo(janela);
 						telaRevisao.dispose();
