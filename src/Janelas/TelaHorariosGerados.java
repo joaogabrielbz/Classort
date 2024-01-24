@@ -4,11 +4,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
@@ -19,6 +21,7 @@ import entidades.Disciplina;
 import entidades.Horario;
 import entidades.Realocacao;
 import entidades.Semana;
+import entidades.TabelaDia;
 import entidades.TabelaDisciplina;
 import entidades.TabelaTurma;
 import entidades.Tabelas;
@@ -28,11 +31,10 @@ import entidades.Turno;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Toolkit;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -49,6 +51,7 @@ public class TelaHorariosGerados extends JDialog {
 	private ArrayList<TurmaDisciplina> turmadisciplinas;;
 	private ArrayList<Tabelas> listTabelas = new ArrayList<Tabelas>();
 	private ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
+	ArrayList<TabelaDia> tabeladias;
 
 	Random rand = new Random();
 
@@ -61,13 +64,17 @@ public class TelaHorariosGerados extends JDialog {
 	private JTabbedPane tpTurmaOuDisciplina;
 	private JPanel panelTurmas;
 	private JPanel panelDisciplina;
+	private JPanel panelSemana;
 	private JTabbedPane tpTurmas;
 	private JTabbedPane tpDisciplinas;
+	private JTabbedPane tpSemanas;
 
 	private ArrayList<Turma> turmas;
 	private ArrayList<Disciplina> disciplinas;
 	private ArrayList<Horario> horarios;
 	private TelaErros telaerro;
+
+	private Semana semana;
 
 	static {
 		UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
@@ -80,6 +87,7 @@ public class TelaHorariosGerados extends JDialog {
 		this.turmas = turmas;
 		this.disciplinas = disciplinas;
 		this.horarios = horarios;
+		this.semana = semana;
 
 		setTitle("Classort");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaHorariosGerados.class.getResource("/imgs/icon.png")));
@@ -153,9 +161,23 @@ public class TelaHorariosGerados extends JDialog {
 		tpDisciplinas.setBackground(new Color(30, 30, 30));
 		panelDisciplina.add(tpDisciplinas, BorderLayout.NORTH);
 
+		panelSemana = new JPanel();
+		panelSemana.setBorder(null);
+		panelSemana.setBackground(new Color(45, 45, 45));
+		tpTurmaOuDisciplina.addTab("Horários por dia", null, panelSemana, null);
+		panelSemana.setLayout(new BorderLayout(0, 0));
+
+		tpSemanas = new JTabbedPane(JTabbedPane.LEFT);
+		tpSemanas.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		tpSemanas.setForeground(Color.WHITE);
+		tpSemanas.setFont(new Font("Noto Sans Light", Font.PLAIN, 16));
+		tpSemanas.setBackground(new Color(30, 30, 30));
+		panelSemana.add(tpSemanas, BorderLayout.NORTH);
+
 		tpTurmaOuDisciplina.setUI(new CustomTabbedPaneUI());
 		tpTurmas.setUI(new CustomTabbedPaneUI());
 		tpDisciplinas.setUI(new CustomTabbedPaneUI());
+		tpSemanas.setUI(new CustomTabbedPaneUI());
 
 		// Criando tabelas vazias por turmas //
 		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
@@ -198,22 +220,76 @@ public class TelaHorariosGerados extends JDialog {
 			Collections.sort(listTabelas, Comparator.comparingInt(tabelas -> tabelas.realocacoes.size()));
 			tabelaturmas = listTabelas.get(0).tabelaturmas;
 			tabeladisciplinas = listTabelas.get(0).tabeladisciplinas;
-			ArrayList<Realocacao> temp = listTabelas.get(0).realocacoes;		
-			
+			ArrayList<Realocacao> temp = listTabelas.get(0).realocacoes;
+
+			// Gerando tabela por dia da semana //
+			tabeladias = gerarTabelasDia(tabelaturmas);
+
 			if (listTabelas.size() == max) {
-				realocacoes = temp;				
+				realocacoes = temp;
 			}
 			listTabelas.clear();
 
 		}
 
 		// Criando JTables e exibindo turmas //
-		exibirTabelas(tabelaturmas, tabeladisciplinas);
+		exibirTabelas(tabelaturmas, tabeladisciplinas, tabeladias);
+		// TODO SALVAR PARA IMPRIMIR//
 		return true;
 
 	}
 
-	private void exibirTabelas(ArrayList<TabelaTurma> tabelaturmas, ArrayList<TabelaDisciplina> tabeladisciplinas) {
+	private ArrayList<TabelaDia> gerarTabelasDia(ArrayList<TabelaTurma> tabelaturmas) {
+		ArrayList<TabelaDia> tabeladias = new ArrayList<TabelaDia>();
+		String[] dias = { "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo" };
+		String[] diasAbreviados = { "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
+
+		for (int i = 0; i < semana.getQtdDias(); i++) {
+			String dia = dias[i];
+			String matriz[][] = new String[horarios.size() + 1][tabelaturmas.size() + 1];
+
+			matriz[0][0] = diasAbreviados[i];
+			int x = 1;
+			for (Horario h : horarios) {
+				matriz[x][0] = h.getInicioHorario();
+				x++;
+			}
+
+			x = 1;
+			;
+			for (TabelaTurma tt : tabelaturmas) {
+
+				String[] coluna = getColuna(tt.getMatriz(), i + 1);
+				String[] colunaComNomeTurma = adicionarNoComeco(coluna, tt.getTurma().getNomeTurma());
+
+				for (int k = 0; k < horarios.size() + 1; k++) {
+					matriz[k][x] = colunaComNomeTurma[k];
+				}
+				x++;
+			}
+			tabeladias.add(new TabelaDia(dia, matriz));
+
+		}
+
+		return tabeladias;
+	}
+
+	public static String[] adicionarNoComeco(String[] vetor, String item) {
+		ArrayList<String> lista = new ArrayList<>(Arrays.asList(vetor));
+		lista.add(0, item);
+		return lista.toArray(new String[0]);
+	}
+
+	private String[] getColuna(String[][] matriz, int coluna) {
+		String[] resultado = new String[matriz.length - 1];
+		for (int i = 1; i < matriz.length; i++) {
+			resultado[i - 1] = matriz[i][coluna];
+		}
+		return resultado;
+	}
+
+	private void exibirTabelas(ArrayList<TabelaTurma> tabelaturmas, ArrayList<TabelaDisciplina> tabeladisciplinas,
+			ArrayList<TabelaDia> tabeladias) {
 		for (TabelaTurma tt : tabelaturmas) {
 			DefaultTableModel model = new DefaultTableModel(tt.getMatriz(), tt.getMatriz()[0]);
 			JTable table = new JTable(model) {
@@ -283,6 +359,53 @@ public class TelaHorariosGerados extends JDialog {
 
 			String nomeTurma = td.getDisciplina().getNomeCompleto();
 			tpDisciplinas.addTab(nomeTurma, scrollPane);
+		}
+
+		for (TabelaDia tdia : tabeladias) {
+			DefaultTableModel model = new DefaultTableModel(tdia.getMatriz(), tdia.getMatriz()[0]);
+			JTable table = new JTable(model) {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+
+			};
+			table.setForeground(new Color(255, 255, 255));
+			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			table.setFont(new Font("Noto Sans Light", Font.PLAIN, 20));
+			table.setBackground(new Color(45, 45, 45));
+			table.getTableHeader().setUI(null);
+			table.setRowHeight(80);
+
+			DefaultTableCellRenderer centralizar = new DefaultTableCellRenderer();
+			centralizar.setHorizontalAlignment(JLabel.CENTER);
+			for (int i = 0; i < table.getColumnCount(); i++) {
+				table.getColumnModel().getColumn(i).setCellRenderer(new MultiLineCellRenderer());
+
+				if (i != 0) {
+					table.getColumnModel().getColumn(i).setPreferredWidth(170);
+				}
+			}
+			JPanel panel = new JPanel(new BorderLayout());
+			panel.setBackground(new Color(30, 30, 30));
+			panel.add(table, BorderLayout.CENTER);
+
+			JScrollPane scrollPane = new JScrollPane(panel);
+			scrollPane.addMouseWheelListener(new MouseWheelListener() {
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    // Rolar horizontalmente
+                    int unitsToScroll = 50 * e.getWheelRotation() * -1;
+                    JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
+                    horizontalScrollBar.setValue(horizontalScrollBar.getValue() - unitsToScroll);
+                }
+            });
+			
+			
+			String nomeDia = tdia.getNomeDia();
+			tpSemanas.addTab(nomeDia, scrollPane);
 		}
 	}
 

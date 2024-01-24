@@ -4,6 +4,7 @@ package janelas;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -30,6 +31,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -66,7 +69,7 @@ public class TelaRevisao extends JDialog {
 		this.horarios = horarios;
 		this.semana = semana;
 		this.maxAulasTurmas = maxAulas;
-		this.maxAulasDisciplinas = maxAulas ;
+		this.maxAulasDisciplinas = maxAulas;
 
 		setModal(true);
 
@@ -89,6 +92,14 @@ public class TelaRevisao extends JDialog {
 		contentPane.add(AulasPorDisciplinas);
 
 		scrollDisciplinas = new JScrollPane();
+		scrollDisciplinas.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				int unitsToScroll = 50 * e.getWheelRotation() * -1; 
+				JScrollBar verticalScrollBar = scrollDisciplinas.getVerticalScrollBar();
+				verticalScrollBar.setValue(verticalScrollBar.getValue() - unitsToScroll);
+			}
+		});
 		scrollDisciplinas.setBounds(10, 66, 334, 246);
 		contentPane.add(scrollDisciplinas);
 
@@ -112,8 +123,8 @@ public class TelaRevisao extends JDialog {
 				if (btAvancar.getText() == "Avançar") {
 					TelaHorariosGerados telahorariosgerados;
 					try {
-						telahorariosgerados = new TelaHorariosGerados(statement, janela, disciplinas, turmas, horarios, semana,
-								turno);
+						telahorariosgerados = new TelaHorariosGerados(statement, janela, disciplinas, turmas, horarios,
+								semana, turno);
 						telahorariosgerados.setLocationRelativeTo(janela);
 						telaRevisao.dispose();
 						telahorariosgerados.setVisible(true);
@@ -173,6 +184,14 @@ public class TelaRevisao extends JDialog {
 		contentPane.add(lblAulasPorTurmas);
 
 		scrollTurmas = new JScrollPane();
+		scrollTurmas.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				int unitsToScroll = 50 * e.getWheelRotation() * -1; 
+				JScrollBar verticalScrollBar = scrollTurmas.getVerticalScrollBar();
+				verticalScrollBar.setValue(verticalScrollBar.getValue() - unitsToScroll);
+			}
+		});
 		scrollTurmas.setBounds(354, 66, 334, 246);
 		contentPane.add(scrollTurmas);
 
@@ -262,7 +281,7 @@ public class TelaRevisao extends JDialog {
 
 			String aulas = (String) table.getValueAt(row, 1);
 			String[] partes = aulas.split("/");
-			int aulasTotais = Integer.parseInt(partes[0]);			
+			int aulasTotais = Integer.parseInt(partes[0]);
 
 			if (aulasTotais > maxAulasDisciplinas) {
 				rendererComponent.setForeground(Color.red);
@@ -285,7 +304,7 @@ public class TelaRevisao extends JDialog {
 
 			String aulas = (String) table.getValueAt(row, 1);
 			String[] partes = aulas.split("/");
-			int aulasTotais = Integer.parseInt(partes[0]);			
+			int aulasTotais = Integer.parseInt(partes[0]);
 
 			if (aulasTotais > maxAulasTurmas) {
 				rendererComponent.setForeground(Color.red);

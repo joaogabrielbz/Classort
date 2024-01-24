@@ -23,6 +23,9 @@ import javax.swing.border.MatteBorder;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.BevelBorder;
@@ -115,6 +118,15 @@ public class PanelTurmaDisciplina extends JPanel {
 		lblVoltar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(30, 30, 30)));
 
 		scrollPaneSelecionadas = new JScrollPane();
+		scrollPaneSelecionadas.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int unitsToScroll = 50 * e.getWheelRotation() * -1;
+                JScrollBar verticalScrollBar = scrollPaneSelecionadas.getVerticalScrollBar();
+                verticalScrollBar.setValue(verticalScrollBar.getValue() - unitsToScroll);
+            }
+        });
+
 		panelSelecionadas = new JPanel();
 
 		panelSelecionadas.setBackground(new Color(45, 45, 45));
