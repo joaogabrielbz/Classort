@@ -520,6 +520,8 @@ public class TelaHorariosGerados extends JDialog {
 						tentativas.add(temp);
 						if (tentativas.size() != aulasPorDia * aulasPorSemana) {
 							if (tt.getMatriz()[i][j] == null) {
+								
+								//if quantidade....
 								if (td.getMatriz()[i][j] == null) {
 									tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
 									td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
