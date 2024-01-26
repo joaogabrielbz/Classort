@@ -6,14 +6,16 @@ public class Disciplina {
 	private int idDisciplina;
 	private String nomeDisciplina;
 	private String professorDisciplina;
-	private int turnoId;
+	private boolean aulasDuplas;
+	private int turnoId;	
 	private int aulasTotais; // Fora do construtor //
 
-	public Disciplina(int idDisciplina, String nomeDisciplina, String professorDisciplina, int turnoId) {
+	public Disciplina(int idDisciplina, String nomeDisciplina, String professorDisciplina, boolean aulasDuplas, int turnoId) {
 		super();
 		this.idDisciplina = idDisciplina;
 		this.nomeDisciplina = nomeDisciplina;
 		this.professorDisciplina = professorDisciplina;
+		this.setAulasDuplas(aulasDuplas);
 		this.turnoId = turnoId;
 	}
 
@@ -59,5 +61,13 @@ public class Disciplina {
 
 	public void setTurnoId(int turnoId) {
 		this.turnoId = turnoId;
+	}
+
+	public boolean isAulasDuplas() {
+		return aulasDuplas;
+	}
+
+	public void setAulasDuplas(boolean aulasDuplas) {
+		this.aulasDuplas = aulasDuplas;
 	}
 }

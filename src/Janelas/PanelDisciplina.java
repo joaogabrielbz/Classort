@@ -18,6 +18,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
@@ -35,13 +37,15 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.JTable;
+import javax.swing.JRadioButton;
 
 public class PanelDisciplina extends JPanel {
 
 	public TelaInicial janela;
 	public Turno turno;
 
-	private ArrayList<Integer> idsDisciplinas = new ArrayList<Integer>();
+	private ArrayList<Disciplina> disciplinas = new ArrayList<Disciplina>();
 	private int idDisciplinaSelecionada;
 
 	private JTextField txtNomeDisciplina;
@@ -56,6 +60,11 @@ public class PanelDisciplina extends JPanel {
 	private JButton btnAvancar;
 
 	private static final long serialVersionUID = 1L;
+	private JTable table;
+	private JLabel lblAulasDuplas;
+	private JRadioButton rdNegarDuplas;
+	private JRadioButton rdPermitirDuplas;
+	private JPanel panel;
 
 	public PanelDisciplina(Statement statement, TelaInicial janela, Turno turno) throws SQLException {
 		setBackground(new Color(30, 30, 30));
@@ -109,7 +118,7 @@ public class PanelDisciplina extends JPanel {
 
 					if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
 						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina,
-								turno.getIdTurno());
+								rdPermitirDuplas.isSelected(), turno.getIdTurno());
 						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 							insertDisciplina(statement, turno, novaDisciplina);
 						} else {
@@ -141,7 +150,7 @@ public class PanelDisciplina extends JPanel {
 
 					if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
 						Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina,
-								turno.getIdTurno());
+								rdPermitirDuplas.isSelected(), turno.getIdTurno());
 						if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 							insertDisciplina(statement, turno, novaDisciplina);
 						} else {
@@ -168,7 +177,7 @@ public class PanelDisciplina extends JPanel {
 
 				if (!nomeDisciplina.isEmpty() && !professorDisciplina.isEmpty()) {
 					Disciplina novaDisciplina = new Disciplina(0, nomeDisciplina, professorDisciplina,
-							turno.getIdTurno());
+							rdPermitirDuplas.isSelected(), turno.getIdTurno());
 					if (btNovaDisciplina.getText().equals("Nova disciplina")) {
 						insertDisciplina(statement, turno, novaDisciplina);
 					} else {
@@ -225,18 +234,18 @@ public class PanelDisciplina extends JPanel {
 						int idDisciplina = r.getInt("idDisciplina");
 						String nomeDisciplina = r.getString("nomeDisciplina");
 						String professorDisciplina = r.getString("professorDisciplina");
+						boolean aulasDuplas = r.getBoolean("aulasDuplas");
 						int turnoId = r.getInt("turnoId");
 
-						
-						
-						disciplinas.add(new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, turnoId));
+						disciplinas.add(new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, aulasDuplas,
+								turnoId));
 					}
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
 
 				Collections.sort(turmas, Comparator.comparing(Turma::getNomeTurma));
-				try {								
+				try {
 					janela.panelturmadisciplina = new PanelTurmaDisciplina(statement, janela, turno, turmas,
 							disciplinas);
 				} catch (SQLException e1) {
@@ -250,70 +259,6 @@ public class PanelDisciplina extends JPanel {
 		btnAvancar.setForeground(Color.WHITE);
 		btnAvancar.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
 		btnAvancar.setBackground(new Color(45, 45, 45));
-
-		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
-				.createSequentialGroup().addContainerGap()
-				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
-						.addComponent(lblVoltar, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 60,
-								GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblTitulo, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
-						.createSequentialGroup()
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addComponent(btNovaDisciplina, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-								.addComponent(btRemoverDisciplina, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
-						.addContainerGap())
-						.addGroup(groupLayout.createSequentialGroup()
-								.addComponent(lblNomeDisciplina, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-								.addGap(225))
-						.addGroup(groupLayout.createSequentialGroup()
-								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-										.addComponent(txtNomeDisciplina, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
-												404, Short.MAX_VALUE)
-										.addComponent(lblProfessorDisciplina, Alignment.LEADING,
-												GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
-										.addComponent(txtProfessorDisciplina, Alignment.LEADING,
-												GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
-								.addContainerGap())
-						.addGroup(groupLayout.createSequentialGroup()
-								.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-								.addContainerGap()))));
-		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
-				.createSequentialGroup().addGap(20)
-				.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE).addGap(18)
-				.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(groupLayout
-						.createParallelGroup(
-								Alignment.LEADING)
-						.addGroup(
-								groupLayout.createSequentialGroup()
-										.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 26,
-												GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(txtNomeDisciplina, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 26,
-												GroupLayout.PREFERRED_SIZE)
-										.addGap(6)
-										.addComponent(txtProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE)
-										.addGap(18)
-										.addComponent(btRemoverDisciplina, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(btNovaDisciplina, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)
-										.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE))
-						.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
-				.addGap(25)));
 
 		listDisciplinas = new JList<String>();
 		listDisciplinas.addKeyListener(new KeyAdapter() {
@@ -336,7 +281,16 @@ public class PanelDisciplina extends JPanel {
 						txtNomeDisciplina.setText(disciplinaProfessorSeparados[0]);
 						txtProfessorDisciplina.setText(disciplinaProfessorSeparados[1]);
 
-						idDisciplinaSelecionada = idsDisciplinas.get(listDisciplinas.getSelectedIndex());
+						idDisciplinaSelecionada = disciplinas.get(listDisciplinas.getSelectedIndex()).getIdDisciplina();
+
+						if(disciplinas.get(listDisciplinas.getSelectedIndex()).isAulasDuplas()) {
+							rdPermitirDuplas.setSelected(true);
+							rdNegarDuplas.setSelected(false);
+						}
+						else {
+							rdPermitirDuplas.setSelected(false);
+							rdNegarDuplas.setSelected(true);
+						}
 
 						btNovaDisciplina.setText("Salvar");
 						btRemoverDisciplina.setVisible(true);
@@ -354,15 +308,107 @@ public class PanelDisciplina extends JPanel {
 		listDisciplinas.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listDisciplinas.setBackground(new Color(45, 45, 45));
 		scrollPane.setViewportView(listDisciplinas);
-		setLayout(groupLayout);
 
 		listDisciplinas.setModel(gerarListModelDisciplina(statement));
+
+		panel = new JPanel();
+		panel.setBackground(new Color(30, 30, 30));
+
+		lblAulasDuplas = new JLabel("Permitir aulas duplas:");
+		lblAulasDuplas.setHorizontalAlignment(SwingConstants.LEFT);
+		lblAulasDuplas.setForeground(new Color(136, 136, 136));
+		lblAulasDuplas.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+
+		rdPermitirDuplas = new JRadioButton("Sim");
+		rdPermitirDuplas.setForeground(new Color(255, 255, 255));
+		rdPermitirDuplas.setBackground(new Color(30, 30, 30));
+		rdPermitirDuplas.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
+
+		rdNegarDuplas = new JRadioButton("Não");
+		rdNegarDuplas.setForeground(new Color(255, 255, 255));
+		rdNegarDuplas.setBackground(new Color(30, 30, 30));
+		rdNegarDuplas.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
+
+		ButtonGroup gp = new ButtonGroup();
+		gp.add(rdPermitirDuplas);
+		gp.add(rdNegarDuplas);
+
+		table = new JTable();
+		GroupLayout groupLayout = new GroupLayout(this);
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
+				.createSequentialGroup().addGap(10)
+				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+						.addGroup(groupLayout.createSequentialGroup()
+								.addComponent(lblTitulo, GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE).addGap(474))
+						.addGroup(groupLayout.createSequentialGroup()
+								.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE).addGap(6)
+								.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 253,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(txtNomeDisciplina, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+										.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 189,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(txtProfessorDisciplina, GroupLayout.DEFAULT_SIZE, 468,
+												Short.MAX_VALUE)
+										.addComponent(panel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(table, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+										.addComponent(btRemoverDisciplina, GroupLayout.DEFAULT_SIZE, 468,
+												Short.MAX_VALUE)
+										.addComponent(btNovaDisciplina, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+										.addGroup(groupLayout.createSequentialGroup()
+												.addPreferredGap(ComponentPlacement.RELATED, 318, Short.MAX_VALUE)
+												.addComponent(btnAvancar, GroupLayout.PREFERRED_SIZE, 150,
+														GroupLayout.PREFERRED_SIZE)))))
+				.addGap(10)));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup().addGap(20)
+						.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE).addGap(18)
+						.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE).addGap(6)
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+								.addGroup(groupLayout.createSequentialGroup()
+										.addComponent(lblNomeDisciplina, GroupLayout.PREFERRED_SIZE, 26,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(6)
+										.addComponent(txtNomeDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(11)
+										.addComponent(lblProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 26,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(6)
+										.addComponent(txtProfessorDisciplina, GroupLayout.PREFERRED_SIZE, 25,
+												GroupLayout.PREFERRED_SIZE)
+										.addGap(11)
+										.addComponent(panel, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
+										.addGap(2).addComponent(table, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+										.addGap(8).addComponent(btRemoverDisciplina).addGap(2)
+										.addComponent(btNovaDisciplina).addGap(20).addComponent(btnAvancar)))
+						.addGap(25)));
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup().addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblAulasDuplas, GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel.createSequentialGroup()
+								.addComponent(rdPermitirDuplas, GroupLayout.PREFERRED_SIZE, 53,
+										GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(rdNegarDuplas,
+										GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)))
+						.addGap(34)));
+		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+						.addComponent(lblAulasDuplas, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+						.addGap(2).addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(rdPermitirDuplas).addComponent(rdNegarDuplas))));
+		panel.setLayout(gl_panel);
+		setLayout(groupLayout);
 	}
 
 	public DefaultListModel<String> gerarListModelDisciplina(Statement statement) throws SQLException {
 
 		DefaultListModel<String> modelDisciplina = new DefaultListModel<String>();
-		idsDisciplinas = new ArrayList<Integer>();
+		disciplinas = new ArrayList<Disciplina>();
 
 		String sql = "SELECT * FROM classortbd.disciplina WHERE turnoid = " + turno.getIdTurno() + "";
 		ResultSet r = statement.executeQuery(sql);
@@ -372,17 +418,18 @@ public class PanelDisciplina extends JPanel {
 			int idDisciplina = r.getInt("idDisciplina");
 			String nomeDisciplina = r.getString("nomeDisciplina");
 			String professorDisciplina = r.getString("professorDisciplina");
-			
-			temp.add(new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, turno.getIdTurno()));
+			boolean aulasDuplas = r.getBoolean("aulasDuplas");
+
+			temp.add(
+					new Disciplina(idDisciplina, nomeDisciplina, professorDisciplina, aulasDuplas, turno.getIdTurno()));
 		}
-		
+
 		Collections.sort(temp, Comparator.comparing(Disciplina::getNomeDisciplina));
 
-		for(Disciplina d : temp) {			
+		for (Disciplina d : temp) {
 			modelDisciplina.addElement(d.getNomeCompleto());
-			idsDisciplinas.add(d.getIdDisciplina());
 		}
-
+		disciplinas = temp;
 		return modelDisciplina;
 	}
 
@@ -394,9 +441,10 @@ public class PanelDisciplina extends JPanel {
 			}
 		}
 		if (!existe) {
-			String sql = "INSERT INTO classortbd.disciplina(nomedisciplina, professordisciplina, turnoid) "
+			String sql = "INSERT INTO classortbd.disciplina(nomedisciplina, professordisciplina, aulasDuplas turnoid) "
 					+ "VALUES ('" + novaDisciplina.getNomeDisciplina() + "', '"
-					+ novaDisciplina.getProfessorDisciplina() + "', " + turno.getIdTurno() + ");";
+					+ novaDisciplina.getProfessorDisciplina() + "', " + rdPermitirDuplas.isSelected() + " ,"
+					+ turno.getIdTurno() + ");";
 			try {
 				statement.execute(sql);
 				listDisciplinas.setModel(gerarListModelDisciplina(statement));
@@ -408,9 +456,10 @@ public class PanelDisciplina extends JPanel {
 	}
 
 	protected void updateDisciplina(Statement statement, Disciplina novaDisciplina) {
-		String sql = "UPDATE classortbd.disciplina SET nomedisciplina='" + novaDisciplina.getNomeDisciplina() + "', "
-				+ "professordisciplina='" + novaDisciplina.getProfessorDisciplina() + "'" + "	WHERE idDisciplina = "
-				+ idDisciplinaSelecionada + ";";
+		String sql = "UPDATE classortbd.disciplina SET aulasDuplas = " + rdPermitirDuplas.isSelected()
+				+ ", nomedisciplina='" + novaDisciplina.getNomeDisciplina() + "', " + "professordisciplina='"
+				+ novaDisciplina.getProfessorDisciplina() + "'" + "	WHERE idDisciplina = " + idDisciplinaSelecionada
+				+ ";";
 		try {
 			statement.execute(sql);
 			listDisciplinas.setModel(gerarListModelDisciplina(statement));
@@ -439,6 +488,6 @@ public class PanelDisciplina extends JPanel {
 		btRemoverDisciplina.setVisible(false);
 		btNovaDisciplina.setText("Nova disciplina");
 		txtNomeDisciplina.setText("");
-		txtProfessorDisciplina.setText("");
+		txtProfessorDisciplina.setText("");		
 	}
 }

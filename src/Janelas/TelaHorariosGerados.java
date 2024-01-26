@@ -257,15 +257,17 @@ public class TelaHorariosGerados extends JDialog {
 
 			x = 1;
 			;
-			for (TabelaTurma tt : tabelaturmas) {
+			if(tabelaturmas.size() != 0) {
+				for (TabelaTurma tt : tabelaturmas) {
 
-				String[] coluna = getColuna(tt.getMatriz(), i + 1);
-				String[] colunaComNomeTurma = adicionarNoComeco(coluna, tt.getTurma().getNomeTurma());
+					String[] coluna = getColuna(tt.getMatriz(), i + 1);
+					String[] colunaComNomeTurma = adicionarNoComeco(coluna, tt.getTurma().getNomeTurma());
 
-				for (int k = 0; k < horarios.size() + 1; k++) {
-					matriz[k][x] = colunaComNomeTurma[k];
+					for (int k = 0; k < horarios.size() + 1; k++) {
+						matriz[k][x] = colunaComNomeTurma[k];
+					}
+					x++;
 				}
-				x++;
 			}
 			tabeladias.add(new TabelaDia(dia, matriz));
 
@@ -360,7 +362,8 @@ public class TelaHorariosGerados extends JDialog {
 			String nomeTurma = td.getDisciplina().getNomeCompleto();
 			tpDisciplinas.addTab(nomeTurma, scrollPane);
 		}
-
+		
+		if(tabeladias != null)
 		for (TabelaDia tdia : tabeladias) {
 			DefaultTableModel model = new DefaultTableModel(tdia.getMatriz(), tdia.getMatriz()[0]);
 			JTable table = new JTable(model) {

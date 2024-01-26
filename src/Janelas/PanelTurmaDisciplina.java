@@ -119,13 +119,13 @@ public class PanelTurmaDisciplina extends JPanel {
 
 		scrollPaneSelecionadas = new JScrollPane();
 		scrollPaneSelecionadas.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                int unitsToScroll = 50 * e.getWheelRotation() * -1;
-                JScrollBar verticalScrollBar = scrollPaneSelecionadas.getVerticalScrollBar();
-                verticalScrollBar.setValue(verticalScrollBar.getValue() - unitsToScroll);
-            }
-        });
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				int unitsToScroll = 50 * e.getWheelRotation() * -1;
+				JScrollBar verticalScrollBar = scrollPaneSelecionadas.getVerticalScrollBar();
+				verticalScrollBar.setValue(verticalScrollBar.getValue() - unitsToScroll);
+			}
+		});
 
 		panelSelecionadas = new JPanel();
 
@@ -342,7 +342,8 @@ public class PanelTurmaDisciplina extends JPanel {
 					ArrayList<Disciplina> temp = new ArrayList<Disciplina>();
 
 					for (int i = 0; i < disciplinasNaoSelecionadas.size(); i++) {
-						if (disciplinasNaoSelecionadas.get(i).getNomeCompleto().toLowerCase().contains(pesquisa.toLowerCase())) {
+						if (disciplinasNaoSelecionadas.get(i).getNomeCompleto().toLowerCase()
+								.contains(pesquisa.toLowerCase())) {
 							temp.add(disciplinasNaoSelecionadas.get(i));
 						}
 					}

@@ -48,8 +48,9 @@ public class TelaInicial extends JFrame {
 		setFont(new Font("SansSerif", Font.PLAIN, 16));
 		setTitle("Classort");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(800, 450);
+		setSize(1000, 600);
 		setLocationRelativeTo(null);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(30, 30, 30));

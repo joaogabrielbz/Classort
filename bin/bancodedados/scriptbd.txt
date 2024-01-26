@@ -10,47 +10,48 @@ CREATE TABLE classortbd.turno (
 );
 
 CREATE TABLE classortbd.horarios (
-    idHorario SERIAL PRIMARY KEY,
-    inicioHorario TIME,
-    fimHorario TIME,
-    turnoId INT,
+    idHorario SERIAL PRIMARY KEY NOT NULL,
+    inicioHorario TIME NOT NULL,
+    fimHorario TIME NOT NULL,
+    turnoId INT NOT NULL,
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
 CREATE TABLE classortbd.semana (
     idSemana SERIAL PRIMARY KEY,
-    segunda BOOLEAN,
-    terca BOOLEAN,
-    quarta BOOLEAN,
-    quinta BOOLEAN,
-    sexta BOOLEAN,
-    sabado BOOLEAN,
-    domingo BOOLEAN,
-    turnoId INT,
+    segunda BOOLEAN NOT NULL,
+    terca BOOLEAN NOT NULL,
+    quarta BOOLEAN NOT NULL,
+    quinta BOOLEAN NOT NULL,
+    sexta BOOLEAN NOT NULL,
+    sabado BOOLEAN NOT NULL,
+    domingo BOOLEAN NOT NULL,
+    turnoId INT NOT NULL,
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
 CREATE TABLE classortbd.turma (
-    idTurma SERIAL PRIMARY KEY,
-    nomeTurma VARCHAR(100) NOT NULL,
-    turnoId INT,
+    idTurma SERIAL PRIMARY KEY NOT NULL,
+    nomeTurma VARCHAR(100) NOT NULL NOT NULL,
+    turnoId INT NOT NULL,
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
 CREATE TABLE classortbd.disciplina (
-    idDisciplina SERIAL PRIMARY KEY,
+    idDisciplina SERIAL PRIMARY KEY NOT NULL,
     nomeDisciplina VARCHAR(100) NOT NULL,
     professorDisciplina VARCHAR(100) NOT NULL,
-    turnoId INT,
+    aulasDuplas BOOLEAN NOT NULL,
+    turnoId INT NOT NULL,
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
 CREATE TABLE classortbd.turma_disciplina (
-    idTurmaDisciplina SERIAL PRIMARY KEY,
-    qtdAulas INT,
-    turmaId INT,
-    disciplinaId INT,
-    turnoId INT,
+    idTurmaDisciplina SERIAL PRIMARY KEY NOT NULL,
+    qtdAulas INT NOT NULL,
+    turmaId INT NOT NULL,
+    disciplinaId INT NOT NULL,
+    turnoId INT NOT NULL,
     FOREIGN KEY (turmaId) REFERENCES classortbd.turma(idTurma),
     FOREIGN KEY (disciplinaId) REFERENCES classortbd.disciplina(idDisciplina),
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
@@ -105,26 +106,27 @@ INSERT INTO classortbd.horarios (inicioHorario, fimHorario, turnoId) VALUES
 
 /* inserindo itens default do turno (3) */
     
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Arte', 'DT1', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Arte', 'DT2', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'Andréia', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'Juliana', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'DT1', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('L Portuguesa', 'DT2', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ed Física', 'DT1', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Matemática', 'Wanderson', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Matemática', 'Thiago', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Matemática', 'DT1', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ciências', 'Viviâne', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ciência ', 'DT1', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Geografia', 'Valério', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Geografia', 'Wallace', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('História', 'Agenor', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('História', 'DT2', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ed Física', 'DT2', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Ens religioso', 'Agenor', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('Inglês', 'Leilane', 3);
-INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, turnoId) VALUES ('História', 'DT1', 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Arte', 'DT1', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Arte', 'DT2', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('L Portuguesa', 'Andréia', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('L Portuguesa', 'Juliana', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('L Portuguesa', 'DT1', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('L Portuguesa', 'DT2', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Ed Física', 'DT1', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Matemática', 'Wanderson', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Matemática', 'Thiago', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Matemática', 'DT1', true, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Ciências', 'Viviâne', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Ciência ', 'DT1', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Geografia', 'Valério', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Geografia', 'Wallace', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('História', 'Agenor', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('História', 'DT2', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Ed Física', 'DT2', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Ens religioso', 'Agenor', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('Inglês', 'Leilane', false, 3);
+INSERT INTO classortbd.disciplina (nomeDisciplina, professorDisciplina, aulasDuplas, turnoId) VALUES ('História', 'DT1', false, 3);
+
 
 INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('6v2', 3);
 INSERT INTO classortbd.turma (nomeTurma, turnoId) VALUES ('6v3', 3);
