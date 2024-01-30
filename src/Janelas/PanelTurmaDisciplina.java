@@ -206,6 +206,7 @@ public class PanelTurmaDisciplina extends JPanel {
 		});
 		listSelecionarDisciplinas.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
+				txtPesquisa.setText("");
 				if (e.getValueIsAdjusting()) {
 					if (listSelecionarDisciplinas.getSelectedIndex() != -1) {
 						int indexClicado = listSelecionarDisciplinas.getSelectedIndex();
@@ -357,6 +358,28 @@ public class PanelTurmaDisciplina extends JPanel {
 				}
 			}
 
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+									
+						if (listSelecionarDisciplinas.getModel().getSize() == 1) {
+							txtPesquisa.setText("");	
+							int indexClicado = 0;
+							int idDisciplinaClicada = disciplinasNaoSelecionadas.get(indexClicado).getIdDisciplina();
+
+							String sql = "INSERT INTO classortbd.turma_disciplina (qtdAulas, turmaId, disciplinaId, turnoId) VALUES "
+									+ "( 1, " + turmas.get(indexTurma).getIdTurma() + ", " + idDisciplinaClicada + ", "
+									+ turno.getIdTurno() + ");";
+							try {
+								statement.execute(sql);
+								carregarDisciplinas(statement);
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+			
 		});
 		txtPesquisa.setForeground(Color.WHITE);
 		txtPesquisa.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));

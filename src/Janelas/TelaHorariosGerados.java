@@ -215,7 +215,9 @@ public class TelaHorariosGerados extends JDialog {
 					break;
 				}
 			}
-
+			
+			System.out.println(listTabelas.size());
+			
 			// Pegando as tabelas que tem menos realocaçoes //
 			Collections.sort(listTabelas, Comparator.comparingInt(tabelas -> tabelas.realocacoes.size()));
 			tabelaturmas = listTabelas.get(0).tabelaturmas;
@@ -257,7 +259,7 @@ public class TelaHorariosGerados extends JDialog {
 
 			x = 1;
 			;
-			if(tabelaturmas.size() != 0) {
+			if (tabelaturmas.size() != 0) {
 				for (TabelaTurma tt : tabelaturmas) {
 
 					String[] coluna = getColuna(tt.getMatriz(), i + 1);
@@ -362,54 +364,53 @@ public class TelaHorariosGerados extends JDialog {
 			String nomeTurma = td.getDisciplina().getNomeCompleto();
 			tpDisciplinas.addTab(nomeTurma, scrollPane);
 		}
-		
-		if(tabeladias != null)
-		for (TabelaDia tdia : tabeladias) {
-			DefaultTableModel model = new DefaultTableModel(tdia.getMatriz(), tdia.getMatriz()[0]);
-			JTable table = new JTable(model) {
-				private static final long serialVersionUID = 1L;
 
-				@Override
-				public boolean isCellEditable(int row, int column) {
-					return false;
+		if (tabeladias != null)
+			for (TabelaDia tdia : tabeladias) {
+				DefaultTableModel model = new DefaultTableModel(tdia.getMatriz(), tdia.getMatriz()[0]);
+				JTable table = new JTable(model) {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public boolean isCellEditable(int row, int column) {
+						return false;
+					}
+
+				};
+				table.setForeground(new Color(255, 255, 255));
+				table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+				table.setFont(new Font("Noto Sans Light", Font.PLAIN, 20));
+				table.setBackground(new Color(45, 45, 45));
+				table.getTableHeader().setUI(null);
+				table.setRowHeight(80);
+
+				DefaultTableCellRenderer centralizar = new DefaultTableCellRenderer();
+				centralizar.setHorizontalAlignment(JLabel.CENTER);
+				for (int i = 0; i < table.getColumnCount(); i++) {
+					table.getColumnModel().getColumn(i).setCellRenderer(new MultiLineCellRenderer());
+
+					if (i != 0) {
+						table.getColumnModel().getColumn(i).setPreferredWidth(170);
+					}
 				}
+				JPanel panel = new JPanel(new BorderLayout());
+				panel.setBackground(new Color(30, 30, 30));
+				panel.add(table, BorderLayout.CENTER);
 
-			};
-			table.setForeground(new Color(255, 255, 255));
-			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			table.setFont(new Font("Noto Sans Light", Font.PLAIN, 20));
-			table.setBackground(new Color(45, 45, 45));
-			table.getTableHeader().setUI(null);
-			table.setRowHeight(80);
+				JScrollPane scrollPane = new JScrollPane(panel);
+				scrollPane.addMouseWheelListener(new MouseWheelListener() {
+					@Override
+					public void mouseWheelMoved(MouseWheelEvent e) {
+						// Rolar horizontalmente
+						int unitsToScroll = 50 * e.getWheelRotation() * -1;
+						JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
+						horizontalScrollBar.setValue(horizontalScrollBar.getValue() - unitsToScroll);
+					}
+				});
 
-			DefaultTableCellRenderer centralizar = new DefaultTableCellRenderer();
-			centralizar.setHorizontalAlignment(JLabel.CENTER);
-			for (int i = 0; i < table.getColumnCount(); i++) {
-				table.getColumnModel().getColumn(i).setCellRenderer(new MultiLineCellRenderer());
-
-				if (i != 0) {
-					table.getColumnModel().getColumn(i).setPreferredWidth(170);
-				}
+				String nomeDia = tdia.getNomeDia();
+				tpSemanas.addTab(nomeDia, scrollPane);
 			}
-			JPanel panel = new JPanel(new BorderLayout());
-			panel.setBackground(new Color(30, 30, 30));
-			panel.add(table, BorderLayout.CENTER);
-
-			JScrollPane scrollPane = new JScrollPane(panel);
-			scrollPane.addMouseWheelListener(new MouseWheelListener() {
-                @Override
-                public void mouseWheelMoved(MouseWheelEvent e) {
-                    // Rolar horizontalmente
-                    int unitsToScroll = 50 * e.getWheelRotation() * -1;
-                    JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
-                    horizontalScrollBar.setValue(horizontalScrollBar.getValue() - unitsToScroll);
-                }
-            });
-			
-			
-			String nomeDia = tdia.getNomeDia();
-			tpSemanas.addTab(nomeDia, scrollPane);
-		}
 	}
 
 	private ArrayList<TabelaDisciplina> gerarTabelaDisciplinaVazia(ArrayList<Disciplina> disciplinas,
@@ -523,12 +524,74 @@ public class TelaHorariosGerados extends JDialog {
 						tentativas.add(temp);
 						if (tentativas.size() != aulasPorDia * aulasPorSemana) {
 							if (tt.getMatriz()[i][j] == null) {
-								
-								//if quantidade....
 								if (td.getMatriz()[i][j] == null) {
-									tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-									td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-									break;
+									// verificando quantas vezes o nome se repete na coluna (nao pode passar de
+									// dois)
+									int vezesQueApareceuNaLinha = 0;
+									for (int y = 0; y < tt.getMatriz().length; y++) {
+										if (tt.getMatriz()[y][j] != null) {
+											if (tt.getMatriz()[y][j].contains(td.getDisciplina().getNomeDisciplina())) {
+												vezesQueApareceuNaLinha++;
+											}
+										}
+									}
+									if (vezesQueApareceuNaLinha < 2) {
+
+										// caso PERMITA aulas duplas
+										if (td.getDisciplina().isAulasDuplas()) {
+											tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+											td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+											break;
+										}
+										// caso NAO PERMITA aulas duplas
+										else {
+
+											// caso esteja na primeira linha
+											if (i == 1) {
+												if (tt.getMatriz()[i + 1][j] == null) {
+													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+													break;
+												} else {
+													if (!tt.getMatriz()[i + 1][j]
+															.contains(td.getDisciplina().getNomeDisciplina())) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+											}
+											// caso esteja na ultima linha
+											else if (i == tt.getMatriz().length - 1) {
+												if (tt.getMatriz()[i - 1][j] == null) {
+													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+													break;
+												} else {
+													if (!tt.getMatriz()[i - 1][j]
+															.contains(td.getDisciplina().getNomeDisciplina())) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+
+											}
+											// caso esteja em outro lugar
+											else {
+												if (tt.getMatriz()[i - 1][j] != td.getDisciplina()
+														.getNomeDisciplina()) {
+													if (tt.getMatriz()[i + 1][j] != td.getDisciplina()
+															.getNomeDisciplina()) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+											}
+										}
+
+									}
 								}
 							}
 						} else {

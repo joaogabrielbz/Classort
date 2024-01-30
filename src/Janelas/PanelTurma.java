@@ -171,40 +171,42 @@ public class PanelTurma extends JPanel {
 		btAvancar.setBackground(new Color(45, 45, 45));
 
 		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup().addContainerGap()
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addComponent(btRemoverTurma, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
-								.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 267, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblVoltar)
-								.addGroup(groupLayout.createSequentialGroup()
-										.addComponent(txtNomeTurma, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(btNovaTurma, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
-								.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
-						.addGap(262)
-						.addComponent(btAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap()));
-		groupLayout
-				.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup().addGap(20)
-								.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-								.addGap(18)
-								.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-										.addComponent(txtNomeTurma, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE)
-										.addComponent(btNovaTurma))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-										.addComponent(btRemoverTurma, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE)
-										.addComponent(btAvancar, GroupLayout.PREFERRED_SIZE, 25,
-												GroupLayout.PREFERRED_SIZE))
-								.addGap(25)));
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(btRemoverTurma, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+						.addComponent(lblVoltar)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(txtNomeTurma, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btNovaTurma, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+						.addComponent(lblTitulo, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
+					.addGap(262)
+					.addComponent(btAvancar, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(20)
+					.addComponent(lblVoltar, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(lblTitulo, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(txtNomeTurma, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btNovaTurma))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btRemoverTurma, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btAvancar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+					.addGap(25))
+		);
 
 		listTurmas = new JList<String>();
 		listTurmas.addKeyListener(new KeyAdapter() {

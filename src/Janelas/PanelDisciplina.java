@@ -58,14 +58,15 @@ public class PanelDisciplina extends JPanel {
 	private JLabel lblNomeDisciplina;
 	private JLabel lblProfessorDisciplina;
 	private JButton btnAvancar;
-
-	private static final long serialVersionUID = 1L;
 	private JTable table;
 	private JLabel lblAulasDuplas;
 	private JRadioButton rdNegarDuplas;
 	private JRadioButton rdPermitirDuplas;
 	private JPanel panel;
+private ButtonGroup gp;
 
+	private static final long serialVersionUID = 1L;
+	
 	public PanelDisciplina(Statement statement, TelaInicial janela, Turno turno) throws SQLException {
 		setBackground(new Color(30, 30, 30));
 		this.janela = janela;
@@ -283,11 +284,10 @@ public class PanelDisciplina extends JPanel {
 
 						idDisciplinaSelecionada = disciplinas.get(listDisciplinas.getSelectedIndex()).getIdDisciplina();
 
-						if(disciplinas.get(listDisciplinas.getSelectedIndex()).isAulasDuplas()) {
+						if (disciplinas.get(listDisciplinas.getSelectedIndex()).isAulasDuplas()) {
 							rdPermitirDuplas.setSelected(true);
 							rdNegarDuplas.setSelected(false);
-						}
-						else {
+						} else {
 							rdPermitirDuplas.setSelected(false);
 							rdNegarDuplas.setSelected(true);
 						}
@@ -329,7 +329,7 @@ public class PanelDisciplina extends JPanel {
 		rdNegarDuplas.setBackground(new Color(30, 30, 30));
 		rdNegarDuplas.setFont(new Font("Noto Sans Light", Font.PLAIN, 15));
 
-		ButtonGroup gp = new ButtonGroup();
+		gp = new ButtonGroup();
 		gp.add(rdPermitirDuplas);
 		gp.add(rdNegarDuplas);
 
@@ -488,6 +488,8 @@ public class PanelDisciplina extends JPanel {
 		btRemoverDisciplina.setVisible(false);
 		btNovaDisciplina.setText("Nova disciplina");
 		txtNomeDisciplina.setText("");
-		txtProfessorDisciplina.setText("");		
+		txtProfessorDisciplina.setText("");
+		gp.getElements().nextElement().setSelected(false); 
+        gp.clearSelection();
 	}
 }
