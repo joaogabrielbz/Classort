@@ -72,7 +72,6 @@ public class TelaInicial extends JFrame {
 			public void mousePressed(MouseEvent e) {
 				SelecionarTurno(statement, listTurnos);
 			}
-
 		});
 
 		listTurnos.setVisibleRowCount(10);

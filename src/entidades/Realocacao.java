@@ -10,7 +10,5 @@ public class Realocacao {
 		super();
 		this.td = td;
 		this.tt = tt;
-	}
-	
-	
+	}	
 }

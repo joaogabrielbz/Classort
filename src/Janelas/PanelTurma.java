@@ -318,8 +318,7 @@ public class PanelTurma extends JPanel {
 			}
 			reiniciarLayout();
 		}
-	}
-	
+	}	
 	
 	private void reiniciarLayout() {
 		btRemoverTurma.setVisible(false);

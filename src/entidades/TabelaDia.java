@@ -22,7 +22,5 @@ public class TabelaDia {
 		super();
 		this.nomeDia = nomeDia;
 		this.matriz = matriz;
-	}
-	
-	
+	}	
 }

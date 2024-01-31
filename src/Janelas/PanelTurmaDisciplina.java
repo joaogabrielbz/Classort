@@ -81,16 +81,12 @@ public class PanelTurmaDisciplina extends JPanel {
 
 	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas,
 			ArrayList<Disciplina> disciplinas) throws SQLException {
-		
-		
-
 		this.janela = janela;
 		this.turno = turno;
 		this.turmas = turmas;
 		this.disciplinas = disciplinas;
 		this.maxAulas = calcularMaxAulas(statement);
-		this.aulasPorDia = getAulasPorDia(statement);
-		
+		this.aulasPorDia = getAulasPorDia(statement);		
 		
 		setBackground(new Color(30, 30, 30));
 		setForeground(new Color(255, 255, 255));
@@ -277,7 +273,6 @@ public class PanelTurmaDisciplina extends JPanel {
 				if (btGerarHorario.getText().equals("Remover")) {
 					deleteTurmaDisciplina(statement);
 				} else {
-
 					salvarQtdAulas(statement);
 					for (Disciplina d : disciplinas) {
 						String sql = "SELECT * FROM classortbd.turma_disciplina " + "WHERE disciplinaId = "
@@ -433,74 +428,6 @@ public class PanelTurmaDisciplina extends JPanel {
 		carregarDisciplinas(statement);
 	}
 
-	private int getAulasPorDia(Statement statement) throws SQLException {
-		int cont = 0;
-		String sql = "";
-		ResultSet r = null;
-
-		sql = "SELECT * FROM classortbd.horarios WHERE turnoId = " + turno.getIdTurno() + ";";
-		r = statement.executeQuery(sql);
-		while (r.next()) {
-			cont++;
-			Time inicioHorarioT = r.getTime("inicioHorario");
-			Time fimHorarioT = r.getTime("fimHorario");
-
-			LocalTime inicioHorarioLT = inicioHorarioT.toLocalTime();
-			LocalTime fimHorarioLT = fimHorarioT.toLocalTime();
-
-			String inicioHorario = inicioHorarioLT.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
-			String fimHorario = fimHorarioLT.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
-
-			horarios.add(new Horario(inicioHorario, fimHorario));
-		}
-		return cont;
-	}
-
-	protected int calcularMaxAulas(Statement statement) throws SQLException {
-		int aulasPorDia = 0;
-		int aulasPorSemana = 0;
-		String sql = "";
-		ResultSet r = null;
-
-		sql = "SELECT * FROM classortbd.horarios WHERE turnoId = " + turno.getIdTurno() + ";";
-		r = statement.executeQuery(sql);
-		while (r.next()) {
-			aulasPorDia++;
-		}
-
-		sql = "SELECT * FROM classortbd.semana WHERE turnoId = " + turno.getIdTurno() + ";";
-		r = statement.executeQuery(sql);
-		if (r.next()) {
-
-			boolean segunda = r.getBoolean("segunda");
-			boolean terca = r.getBoolean("terca");
-			boolean quarta = r.getBoolean("quarta");
-			boolean quinta = r.getBoolean("quinta");
-			boolean sexta = r.getBoolean("sexta");
-			boolean sabado = r.getBoolean("sabado");
-			boolean domingo = r.getBoolean("domingo");
-
-			semana = new Semana(segunda, terca, quarta, quinta, sexta, sabado, domingo);
-
-			if (segunda)
-				aulasPorSemana++;
-			if (terca)
-				aulasPorSemana++;
-			if (quarta)
-				aulasPorSemana++;
-			if (quinta)
-				aulasPorSemana++;
-			if (sexta)
-				aulasPorSemana++;
-			if (sabado)
-				aulasPorSemana++;
-			if (domingo)
-				aulasPorSemana++;
-
-		}
-		return aulasPorSemana * aulasPorDia;
-	}
-
 	private void carregarDisciplinas(Statement statement) throws SQLException {
 		if (turmas.size() != 0) {
 
@@ -628,6 +555,74 @@ public class PanelTurmaDisciplina extends JPanel {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private int getAulasPorDia(Statement statement) throws SQLException {
+		int cont = 0;
+		String sql = "";
+		ResultSet r = null;
+
+		sql = "SELECT * FROM classortbd.horarios WHERE turnoId = " + turno.getIdTurno() + ";";
+		r = statement.executeQuery(sql);
+		while (r.next()) {
+			cont++;
+			Time inicioHorarioT = r.getTime("inicioHorario");
+			Time fimHorarioT = r.getTime("fimHorario");
+
+			LocalTime inicioHorarioLT = inicioHorarioT.toLocalTime();
+			LocalTime fimHorarioLT = fimHorarioT.toLocalTime();
+
+			String inicioHorario = inicioHorarioLT.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+			String fimHorario = fimHorarioLT.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+
+			horarios.add(new Horario(inicioHorario, fimHorario));
+		}
+		return cont;
+	}
+
+	protected int calcularMaxAulas(Statement statement) throws SQLException {
+		int aulasPorDia = 0;
+		int aulasPorSemana = 0;
+		String sql = "";
+		ResultSet r = null;
+
+		sql = "SELECT * FROM classortbd.horarios WHERE turnoId = " + turno.getIdTurno() + ";";
+		r = statement.executeQuery(sql);
+		while (r.next()) {
+			aulasPorDia++;
+		}
+
+		sql = "SELECT * FROM classortbd.semana WHERE turnoId = " + turno.getIdTurno() + ";";
+		r = statement.executeQuery(sql);
+		if (r.next()) {
+
+			boolean segunda = r.getBoolean("segunda");
+			boolean terca = r.getBoolean("terca");
+			boolean quarta = r.getBoolean("quarta");
+			boolean quinta = r.getBoolean("quinta");
+			boolean sexta = r.getBoolean("sexta");
+			boolean sabado = r.getBoolean("sabado");
+			boolean domingo = r.getBoolean("domingo");
+
+			semana = new Semana(segunda, terca, quarta, quinta, sexta, sabado, domingo);
+
+			if (segunda)
+				aulasPorSemana++;
+			if (terca)
+				aulasPorSemana++;
+			if (quarta)
+				aulasPorSemana++;
+			if (quinta)
+				aulasPorSemana++;
+			if (sexta)
+				aulasPorSemana++;
+			if (sabado)
+				aulasPorSemana++;
+			if (domingo)
+				aulasPorSemana++;
+
+		}
+		return aulasPorSemana * aulasPorDia;
 	}
 
 	private void voltarTurma(Statement statement) {

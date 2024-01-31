@@ -9,7 +9,7 @@ public class Disciplina  {
 	private boolean aulasDuplas;
 	private int turnoId;	
 	private int aulasTotais; // Fora do construtor //
-	private String[][] aulas;
+	private String[][] aulas; // Fora do construtor //
 
 	public Disciplina(int idDisciplina, String nomeDisciplina, String professorDisciplina, boolean aulasDuplas, int turnoId) {
 		super();

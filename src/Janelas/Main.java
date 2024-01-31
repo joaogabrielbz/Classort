@@ -155,9 +155,7 @@ public class Main extends JFrame {
 						main.getContentPane().setBackground(new Color(192, 0, 9));
 					}
 				}
-
 			}
-
 		});
 		btEntrar.setBounds(10, 118, 257, 23);
 		contentPane.add(btEntrar);	

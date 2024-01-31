@@ -13,7 +13,6 @@ import entidades.Horario;
 import entidades.Semana;
 import entidades.Turma;
 import entidades.Turno;
-
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collections;

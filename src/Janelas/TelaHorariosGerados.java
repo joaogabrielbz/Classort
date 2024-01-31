@@ -89,20 +89,6 @@ public class TelaHorariosGerados extends JDialog {
 		this.horarios = horarios;
 		this.semana = semana;
 
-//		for (Disciplina d : disciplinas) {
-//			 int rowCount = d.getAulas().length;
-//		        int colCount = d.getAulas()[0].length;
-//
-//		        System.out.println(d.getNomeCompleto());
-//
-//		        for (int i = 0; i < rowCount; i++) {
-//		            for (int j = 0; j < colCount; j++) {
-//		                System.out.print(d.getAulas()[i][j] + "\t");
-//		            }
-//		            System.out.println();
-//		        }
-//		}
-
 		setTitle("Classort");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaHorariosGerados.class.getResource("/imgs/icon.png")));
 		setBackground(new Color(30, 30, 30));
@@ -222,7 +208,7 @@ public class TelaHorariosGerados extends JDialog {
 			});
 
 			// Gerando horarios e pegando o com menos realocacoes//
-			int max = 35000;
+			int max = 15000;
 			for (int i = 0; i < max; i++) {
 				listTabelas.add(gerarTabelas(statement));
 				if (listTabelas.get(listTabelas.size() - 1).realocacoes.size() == 0) {
@@ -253,57 +239,158 @@ public class TelaHorariosGerados extends JDialog {
 		// TODO SALVAR PARA IMPRIMIR//
 		return true;
 
-	}
+	};
 
-	private ArrayList<TabelaDia> gerarTabelasDia(ArrayList<TabelaTurma> tabelaturmas) {
-		ArrayList<TabelaDia> tabeladias = new ArrayList<TabelaDia>();
-		String[] dias = { "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo" };
-		String[] diasAbreviados = { "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
+	private Tabelas gerarTabelas(Statement statement) {
+		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
+		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(statement, disciplinas, horarios);
+		ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
 
-		for (int i = 0; i < semana.getQtdDias(); i++) {
-			String dia = dias[i];
-			String matriz[][] = new String[horarios.size() + 1][tabelaturmas.size() + 1];
+		for (TurmaDisciplina turmadisciplina : turmadisciplinas) {
+			int quantidade = turmadisciplina.getQtdAulas();
+			TabelaDisciplina td = null;
+			TabelaTurma tt = null;
 
-			matriz[0][0] = diasAbreviados[i];
-			int x = 1;
-			for (Horario h : horarios) {
-				matriz[x][0] = h.getInicioHorario();
-				x++;
-			}
-
-			x = 1;
-			;
-			if (tabelaturmas.size() != 0) {
-				for (TabelaTurma tt : tabelaturmas) {
-
-					String[] coluna = getColuna(tt.getMatriz(), i + 1);
-					String[] colunaComNomeTurma = adicionarNoComeco(coluna, tt.getTurma().getNomeTurma());
-
-					for (int k = 0; k < horarios.size() + 1; k++) {
-						matriz[k][x] = colunaComNomeTurma[k];
-					}
-					x++;
+			// Coletando tabeladisciplina correta e seu index //
+			for (TabelaDisciplina temp : tabeladisciplinas) {
+				if (temp.getDisciplina().getIdDisciplina() == turmadisciplina.getDisciplinaId()) {
+					td = temp;
+					break;
 				}
 			}
-			tabeladias.add(new TabelaDia(dia, matriz));
 
+			// Coletando tabelaturma correta e seu index //
+			for (TabelaTurma temp : tabelaturmas) {
+				if (temp.getTurma().getIdTurma() == turmadisciplina.getTurmaId()) {
+					tt = temp;
+					break;
+				}
+			}
+
+			// Inserindo de acordo com a quantidade de aulas //
+			for (int x = 0; x < quantidade; x++) {
+				int i = 1;
+				int j = 1;
+
+				// para cada quantidade de aulas desta turmadisciplina //
+				ArrayList<Coordenada> tentativas = new ArrayList<Coordenada>();
+				while (true) {
+					i = rand.nextInt(tt.getMatriz().length - 1) + 1;
+					j = rand.nextInt(tt.getMatriz()[0].length - 1) + 1;
+
+					boolean jaTentou = false;
+
+					Coordenada temp = new Coordenada(i, j);
+					for (Coordenada c : tentativas) {
+						if (c.i == temp.i && c.j == temp.j) {
+							jaTentou = true;
+							break;
+						}
+					}
+
+					if (!jaTentou) {
+						tentativas.add(temp);
+						if (tentativas.size() != aulasPorDia * aulasPorSemana) {
+							if (tt.getMatriz()[i][j] == null) {
+								if (td.getMatriz()[i][j] == null) {
+
+									int vezesQueApareceuNaLinha = 0;
+									for (int y = 0; y < tt.getMatriz().length; y++) {
+										if (tt.getMatriz()[y][j] != null) {
+											if (tt.getMatriz()[y][j].contains(td.getDisciplina().getNomeDisciplina())) {
+												vezesQueApareceuNaLinha++;
+											}
+										}
+									}
+									if (vezesQueApareceuNaLinha < 2) {
+										// caso PERMITA aulas duplas
+										if (td.getDisciplina().isAulasDuplas()) {
+											tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+											td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+											break;
+										}
+										// caso NAO PERMITA aulas duplas
+										if (!td.getDisciplina().isAulasDuplas()) {
+											// caso esteja na primeira linha
+											if (i == 1) {
+												if (tt.getMatriz()[i + 1][j] == null) {
+													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+													break;
+												} else {
+													if (!tt.getMatriz()[i + 1][j]
+															.contains(td.getDisciplina().getNomeDisciplina())) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+											}
+											// caso esteja na ultima linha
+											else if (i == tt.getMatriz().length - 1) {
+												if (tt.getMatriz()[i - 1][j] == null) {
+													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+													break;
+												} else {
+													if (!tt.getMatriz()[i - 1][j]
+															.contains(td.getDisciplina().getNomeDisciplina())) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+
+											}
+											// caso esteja em outro lugar
+											else {
+												//se os dois sao nulos
+												if (tt.getMatriz()[i - 1][j] == null
+														&& tt.getMatriz()[i + 1][j] == null) {
+													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+													break;
+												} 
+												//se o de cima é nulo (confere o debaixo)
+												else if(tt.getMatriz()[i - 1][j] == null) {
+													if(!tt.getMatriz()[i + 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+												else if(tt.getMatriz()[i + 1][j] == null) {
+													if(!tt.getMatriz()[i - 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+														break;
+													}
+												}
+												else {
+													if(!tt.getMatriz()[i + 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+														if(!tt.getMatriz()[i - 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+															tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
+															td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
+															break;
+														}
+														
+													}
+													
+												}
+											}
+										}
+									}
+								}
+							}
+						} else {
+							realocacoes.add(new Realocacao(td, tt));
+							break;
+						}
+					}
+				}
+			}
 		}
-
-		return tabeladias;
-	}
-
-	public static String[] adicionarNoComeco(String[] vetor, String item) {
-		ArrayList<String> lista = new ArrayList<>(Arrays.asList(vetor));
-		lista.add(0, item);
-		return lista.toArray(new String[0]);
-	}
-
-	private String[] getColuna(String[][] matriz, int coluna) {
-		String[] resultado = new String[matriz.length - 1];
-		for (int i = 1; i < matriz.length; i++) {
-			resultado[i - 1] = matriz[i][coluna];
-		}
-		return resultado;
+		return new Tabelas(tabelaturmas, tabeladisciplinas, realocacoes);
 	}
 
 	private void exibirTabelas(ArrayList<TabelaTurma> tabelaturmas, ArrayList<TabelaDisciplina> tabeladisciplinas,
@@ -498,143 +585,55 @@ public class TelaHorariosGerados extends JDialog {
 		return tabelaturmas;
 	}
 
-	private Tabelas gerarTabelas(Statement statement) {
-		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
-		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(statement, disciplinas, horarios);
-		ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
+	private ArrayList<TabelaDia> gerarTabelasDia(ArrayList<TabelaTurma> tabelaturmas) {
+		ArrayList<TabelaDia> tabeladias = new ArrayList<TabelaDia>();
+		String[] dias = { "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo" };
+		String[] diasAbreviados = { "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom" };
 
-		for (TurmaDisciplina turmadisciplina : turmadisciplinas) {
-			int quantidade = turmadisciplina.getQtdAulas();
-			TabelaDisciplina td = null;
-			TabelaTurma tt = null;
-			@SuppressWarnings("unused")
-			int indexTabelaDisciplina = 0;
-			@SuppressWarnings("unused")
-			int indexTabelaTurma = 0;
+		for (int i = 0; i < semana.getQtdDias(); i++) {
+			String dia = dias[i];
+			String matriz[][] = new String[horarios.size() + 1][tabelaturmas.size() + 1];
 
-			// Coletando tabeladisciplina correta e seu index //
-			for (TabelaDisciplina temp : tabeladisciplinas) {
-				if (temp.getDisciplina().getIdDisciplina() == turmadisciplina.getDisciplinaId()) {
-					td = temp;
-					break;
-				} else {
-					indexTabelaDisciplina++;
-				}
+			matriz[0][0] = diasAbreviados[i];
+			int x = 1;
+			for (Horario h : horarios) {
+				matriz[x][0] = h.getInicioHorario();
+				x++;
 			}
 
-			// Coletando tabelaturma correta e seu index //
-			for (TabelaTurma temp : tabelaturmas) {
-				if (temp.getTurma().getIdTurma() == turmadisciplina.getTurmaId()) {
-					tt = temp;
-					break;
-				} else {
-					indexTabelaTurma++;
-				}
-			}
+			x = 1;
+			;
+			if (tabelaturmas.size() != 0) {
+				for (TabelaTurma tt : tabelaturmas) {
 
-			// Inserindo de acordo com a quantidade de aulas //
-			for (int x = 0; x < quantidade; x++) {
-				int i = 1;
-				int j = 1;
+					String[] coluna = getColuna(tt.getMatriz(), i + 1);
+					String[] colunaComNomeTurma = adicionarNoComeco(coluna, tt.getTurma().getNomeTurma());
 
-				ArrayList<Coordenada> tentativas = new ArrayList<Coordenada>();
-				while (true) {
-					i = rand.nextInt(tt.getMatriz().length - 1) + 1;
-					j = rand.nextInt(tt.getMatriz()[0].length - 1) + 1;
-
-					boolean jaTentou = false;
-
-					Coordenada temp = new Coordenada(i, j);
-					for (Coordenada c : tentativas) {
-						if (c.i == temp.i && c.j == temp.j) {
-							jaTentou = true;
-							break;
-						}
+					for (int k = 0; k < horarios.size() + 1; k++) {
+						matriz[k][x] = colunaComNomeTurma[k];
 					}
-
-					if (!jaTentou) {
-						tentativas.add(temp);
-						if (tentativas.size() != aulasPorDia * aulasPorSemana) {
-							if (tt.getMatriz()[i][j] == null) {
-								if (td.getMatriz()[i][j] == null) {
-									// verificando quantas vezes o nome se repete na coluna (nao pode passar de
-									// dois)
-									int vezesQueApareceuNaLinha = 0;
-									for (int y = 0; y < tt.getMatriz().length; y++) {
-										if (tt.getMatriz()[y][j] != null) {
-											if (tt.getMatriz()[y][j].contains(td.getDisciplina().getNomeDisciplina())) {
-												vezesQueApareceuNaLinha++;
-											}
-										}
-									}
-									if (vezesQueApareceuNaLinha < 2) {
-
-										// caso PERMITA aulas duplas
-										if (td.getDisciplina().isAulasDuplas()) {
-											tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-											td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-											break;
-										}
-										// caso NAO PERMITA aulas duplas
-										else {
-
-											// caso esteja na primeira linha
-											if (i == 1) {
-												if (tt.getMatriz()[i + 1][j] == null) {
-													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-													break;
-												} else {
-													if (!tt.getMatriz()[i + 1][j]
-															.contains(td.getDisciplina().getNomeDisciplina())) {
-														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-														break;
-													}
-												}
-											}
-											// caso esteja na ultima linha
-											else if (i == tt.getMatriz().length - 1) {
-												if (tt.getMatriz()[i - 1][j] == null) {
-													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-													break;
-												} else {
-													if (!tt.getMatriz()[i - 1][j]
-															.contains(td.getDisciplina().getNomeDisciplina())) {
-														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-														break;
-													}
-												}
-
-											}
-											// caso esteja em outro lugar
-											else {
-												if (tt.getMatriz()[i - 1][j] != td.getDisciplina()
-														.getNomeDisciplina()) {
-													if (tt.getMatriz()[i + 1][j] != td.getDisciplina()
-															.getNomeDisciplina()) {
-														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
-														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
-														break;
-													}
-												}
-											}
-										}
-
-									}
-								}
-							}
-						} else {
-							realocacoes.add(new Realocacao(td, tt));
-							break;
-						}
-					}
+					x++;
 				}
 			}
+			tabeladias.add(new TabelaDia(dia, matriz));
+
 		}
-		return new Tabelas(tabelaturmas, tabeladisciplinas, realocacoes);
+
+		return tabeladias;
+	}
+
+	public static String[] adicionarNoComeco(String[] vetor, String item) {
+		ArrayList<String> lista = new ArrayList<>(Arrays.asList(vetor));
+		lista.add(0, item);
+		return lista.toArray(new String[0]);
+	}
+
+	private String[] getColuna(String[][] matriz, int coluna) {
+		String[] resultado = new String[matriz.length - 1];
+		for (int i = 1; i < matriz.length; i++) {
+			resultado[i - 1] = matriz[i][coluna];
+		}
+		return resultado;
 	}
 
 	class MultiLineCellRenderer extends DefaultTableCellRenderer {

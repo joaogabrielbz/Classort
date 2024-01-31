@@ -10,6 +10,5 @@ public class Coordenada {
 		super();
 		this.i = i;
 		this.j = j;
-	}
-	
+	}	
 }
