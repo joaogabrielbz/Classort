@@ -2,13 +2,14 @@ package entidades;
 
 //joaogabrielbz//
 
-public class Disciplina {
+public class Disciplina  {
 	private int idDisciplina;
 	private String nomeDisciplina;
 	private String professorDisciplina;
 	private boolean aulasDuplas;
 	private int turnoId;	
 	private int aulasTotais; // Fora do construtor //
+	private String[][] aulas;
 
 	public Disciplina(int idDisciplina, String nomeDisciplina, String professorDisciplina, boolean aulasDuplas, int turnoId) {
 		super();
@@ -69,5 +70,13 @@ public class Disciplina {
 
 	public void setAulasDuplas(boolean aulasDuplas) {
 		this.aulasDuplas = aulasDuplas;
+	}
+
+	public String[][] getAulas() {
+		return aulas;
+	}
+
+	public void setAulas(String[][] aulas) {
+		this.aulas = aulas;
 	}
 }

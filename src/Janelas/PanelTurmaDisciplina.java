@@ -81,6 +81,8 @@ public class PanelTurmaDisciplina extends JPanel {
 
 	public PanelTurmaDisciplina(Statement statement, TelaInicial janela, Turno turno, ArrayList<Turma> turmas,
 			ArrayList<Disciplina> disciplinas) throws SQLException {
+		
+		
 
 		this.janela = janela;
 		this.turno = turno;
@@ -88,7 +90,8 @@ public class PanelTurmaDisciplina extends JPanel {
 		this.disciplinas = disciplinas;
 		this.maxAulas = calcularMaxAulas(statement);
 		this.aulasPorDia = getAulasPorDia(statement);
-
+		
+		
 		setBackground(new Color(30, 30, 30));
 		setForeground(new Color(255, 255, 255));
 

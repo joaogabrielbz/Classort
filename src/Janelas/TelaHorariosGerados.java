@@ -89,6 +89,20 @@ public class TelaHorariosGerados extends JDialog {
 		this.horarios = horarios;
 		this.semana = semana;
 
+//		for (Disciplina d : disciplinas) {
+//			 int rowCount = d.getAulas().length;
+//		        int colCount = d.getAulas()[0].length;
+//
+//		        System.out.println(d.getNomeCompleto());
+//
+//		        for (int i = 0; i < rowCount; i++) {
+//		            for (int j = 0; j < colCount; j++) {
+//		                System.out.print(d.getAulas()[i][j] + "\t");
+//		            }
+//		            System.out.println();
+//		        }
+//		}
+
 		setTitle("Classort");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaHorariosGerados.class.getResource("/imgs/icon.png")));
 		setBackground(new Color(30, 30, 30));
@@ -183,7 +197,7 @@ public class TelaHorariosGerados extends JDialog {
 		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
 
 		// Criando tabelas vazias por disciplinas //
-		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(disciplinas, horarios);
+		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(statement, disciplinas, horarios);
 
 		// Coletando TurmaDisciplinas//
 		String sql = "SELECT * FROM classortbd.turma_disciplina WHERE turnoId = " + turno.getIdTurno() + " ;";
@@ -210,14 +224,14 @@ public class TelaHorariosGerados extends JDialog {
 			// Gerando horarios e pegando o com menos realocacoes//
 			int max = 35000;
 			for (int i = 0; i < max; i++) {
-				listTabelas.add(gerarTabelas());
+				listTabelas.add(gerarTabelas(statement));
 				if (listTabelas.get(listTabelas.size() - 1).realocacoes.size() == 0) {
 					break;
 				}
 			}
-			
+
 			System.out.println(listTabelas.size());
-			
+
 			// Pegando as tabelas que tem menos realocaçoes //
 			Collections.sort(listTabelas, Comparator.comparingInt(tabelas -> tabelas.realocacoes.size()));
 			tabelaturmas = listTabelas.get(0).tabelaturmas;
@@ -413,8 +427,8 @@ public class TelaHorariosGerados extends JDialog {
 			}
 	}
 
-	private ArrayList<TabelaDisciplina> gerarTabelaDisciplinaVazia(ArrayList<Disciplina> disciplinas,
-			ArrayList<Horario> horarios) {
+	private ArrayList<TabelaDisciplina> gerarTabelaDisciplinaVazia(Statement statement,
+			ArrayList<Disciplina> disciplinas, ArrayList<Horario> horarios) {
 		ArrayList<TabelaDisciplina> tabeladisciplinas = new ArrayList<TabelaDisciplina>();
 		for (Disciplina d : disciplinas) {
 			String[][] matriz = new String[aulasPorDia + 1][aulasPorSemana + 1];
@@ -434,6 +448,24 @@ public class TelaHorariosGerados extends JDialog {
 			while (j != aulasPorSemana + 1) {
 				matriz[0][j] = dias[j];
 				j++;
+			}
+
+			String sql = "SELECT * FROM classortbd.aula_proibida WHERE disciplinaId = " + d.getIdDisciplina() + ";";
+			ResultSet r;
+			try {
+
+				r = statement.executeQuery(sql);
+				while (r.next()) {
+					;
+					int horaIndex = r.getInt("horaIndex");
+					int diaIndex = r.getInt("diaIndex");
+
+					matriz[horaIndex][diaIndex] = "X";
+				}
+
+				d.setAulas(matriz);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
 			}
 			tabeladisciplinas.add(new TabelaDisciplina(d, matriz));
 		}
@@ -466,9 +498,9 @@ public class TelaHorariosGerados extends JDialog {
 		return tabelaturmas;
 	}
 
-	private Tabelas gerarTabelas() {
+	private Tabelas gerarTabelas(Statement statement) {
 		ArrayList<TabelaTurma> tabelaturmas = getTabelaTurmaVazia(turmas, horarios);
-		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(disciplinas, horarios);
+		ArrayList<TabelaDisciplina> tabeladisciplinas = gerarTabelaDisciplinaVazia(statement, disciplinas, horarios);
 		ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
 
 		for (TurmaDisciplina turmadisciplina : turmadisciplinas) {

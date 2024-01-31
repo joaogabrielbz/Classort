@@ -57,6 +57,14 @@ CREATE TABLE classortbd.turma_disciplina (
     FOREIGN KEY (turnoId) REFERENCES classortbd.turno(idTurno)
 );
 
+CREATE TABLE classortbd.aula_proibida (
+    idAulaProibida SERIAL PRIMARY KEY NOT NULL,
+    disciplinaId INT NOT NULL,    
+    horaIndex INT NOT NULL,
+    diaIndex INT NOT NULL,
+    FOREIGN KEY (disciplinaId) REFERENCES classortbd.disciplina(idDisciplina)
+);
+
 /* Inserindo turnos */
 
 INSERT INTO classortbd.turno (nomeTurno) VALUES 
