@@ -45,13 +45,18 @@ import javax.swing.JTable;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
+import javax.swing.JButton;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class TelaHorariosGerados extends JDialog {
 
 	private ArrayList<TurmaDisciplina> turmadisciplinas;;
 	private ArrayList<Tabelas> listTabelas = new ArrayList<Tabelas>();
 	private ArrayList<Realocacao> realocacoes = new ArrayList<Realocacao>();
-	ArrayList<TabelaDia> tabeladias;
+
+	private ArrayList<TabelaDia> tabeladias;
+	private Tabelas tabela;
 
 	Random rand = new Random();
 
@@ -75,6 +80,7 @@ public class TelaHorariosGerados extends JDialog {
 	private TelaErros telaerro;
 
 	private Semana semana;
+
 
 	static {
 		UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
@@ -111,6 +117,19 @@ public class TelaHorariosGerados extends JDialog {
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		JButton btExportar = new JButton("Exportar planilhas");
+		btExportar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				new GerarPlanilhas(turno, tabela, tabeladias);
+			}
+		});
+		btExportar.setForeground(Color.WHITE);
+		btExportar.setFont(new Font("Noto Sans Light", Font.PLAIN, 12));
+		btExportar.setBackground(new Color(45, 45, 45));
+		btExportar.setBounds(926, 577, 200, 25);
+		contentPane.add(btExportar);
 		setModal(true);
 
 		if (gerarTela(statement, disciplinas, turmas, horarios, turno)) {
@@ -222,6 +241,7 @@ public class TelaHorariosGerados extends JDialog {
 			Collections.sort(listTabelas, Comparator.comparingInt(tabelas -> tabelas.realocacoes.size()));
 			tabelaturmas = listTabelas.get(0).tabelaturmas;
 			tabeladisciplinas = listTabelas.get(0).tabeladisciplinas;
+			this.tabela = listTabelas.get(0);
 			ArrayList<Realocacao> temp = listTabelas.get(0).realocacoes;
 
 			// Gerando tabela por dia da semana //
@@ -344,38 +364,40 @@ public class TelaHorariosGerados extends JDialog {
 											}
 											// caso esteja em outro lugar
 											else {
-												//se os dois sao nulos
+												// se os dois sao nulos
 												if (tt.getMatriz()[i - 1][j] == null
 														&& tt.getMatriz()[i + 1][j] == null) {
 													tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
 													td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
 													break;
-												} 
-												//se o de cima é nulo (confere o debaixo)
-												else if(tt.getMatriz()[i - 1][j] == null) {
-													if(!tt.getMatriz()[i + 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+												}
+												// se o de cima é nulo (confere o debaixo)
+												else if (tt.getMatriz()[i - 1][j] == null) {
+													if (!tt.getMatriz()[i + 1][j]
+															.contains(td.getDisciplina().getNomeCompleto())) {
 														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
 														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
 														break;
 													}
-												}
-												else if(tt.getMatriz()[i + 1][j] == null) {
-													if(!tt.getMatriz()[i - 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+												} else if (tt.getMatriz()[i + 1][j] == null) {
+													if (!tt.getMatriz()[i - 1][j]
+															.contains(td.getDisciplina().getNomeCompleto())) {
 														tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
 														td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
 														break;
 													}
-												}
-												else {
-													if(!tt.getMatriz()[i + 1][j].contains(td.getDisciplina().getNomeCompleto())) {
-														if(!tt.getMatriz()[i - 1][j].contains(td.getDisciplina().getNomeCompleto())) {
+												} else {
+													if (!tt.getMatriz()[i + 1][j]
+															.contains(td.getDisciplina().getNomeCompleto())) {
+														if (!tt.getMatriz()[i - 1][j]
+																.contains(td.getDisciplina().getNomeCompleto())) {
 															tt.getMatriz()[i][j] = td.getDisciplina().getNomeCompleto();
 															td.getMatriz()[i][j] = tt.getTurma().getNomeTurma();
 															break;
 														}
-														
+
 													}
-													
+
 												}
 											}
 										}

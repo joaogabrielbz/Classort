@@ -223,7 +223,6 @@ public class PanelDisciplina extends JPanel {
 
 		btAvancar = new JButton("Avançar");
 		btAvancar.addMouseListener(new MouseAdapter() {
-			@SuppressWarnings("resource")
 			@Override
 			public void mousePressed(MouseEvent e) {
 
@@ -371,23 +370,53 @@ public class PanelDisciplina extends JPanel {
 				String value = (String) tableAulasProibidas.getModel().getValueAt(row, col);
 
 				if (idDisciplinaSelecionada != 0) {
+					int qtdAulas = 0;
+					int aulasTotais = aulasPorDia * aulasPorSemana;
+					int aulasMarcadas = 0;
+
+					String sql = "SELECT qtdaulas FROM classortbd.turma_disciplina WHERE disciplinaId = "
+							+ idDisciplinaSelecionada + ";;" + "";
+
+					try {
+						ResultSet r = statement.executeQuery(sql);
+						while (r.next()) {
+							qtdAulas = qtdAulas + r.getInt("qtdAulas");
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+
+					int aulasQuePodeMarcar = aulasTotais - qtdAulas;
+					
+					 sql = "SELECT idaulaproibida FROM classortbd.aula_proibida WHERE disciplinaid = "+idDisciplinaSelecionada+";";
+
+					try {
+						ResultSet r = statement.executeQuery(sql);
+						while (r.next()) {
+							aulasMarcadas++;
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+
 					if (row > 0 && col > 0) {
 						if (value == "X") {
-							String sql = "DELETE FROM classortbd.aula_proibida WHERE disciplinaid = "
-									+ idDisciplinaSelecionada + " AND horaindex = " + row + " AND" + "	diaindex = "
-									+ col + ";";
+							sql = "DELETE FROM classortbd.aula_proibida WHERE disciplinaid = " + idDisciplinaSelecionada
+									+ " AND horaindex = " + row + " AND" + "	diaindex = " + col + ";";
 							try {
 								statement.execute(sql);
 							} catch (SQLException e1) {
 								e1.printStackTrace();
 							}
 						} else {
-							String sql = "INSERT INTO classortbd.aula_proibida(disciplinaid, horaindex, diaindex)"
-									+ "	VALUES (" + idDisciplinaSelecionada + ", " + row + ", " + col + ");";
-							try {
-								statement.execute(sql);
-							} catch (SQLException e1) {
-								e1.printStackTrace();
+							if(aulasMarcadas < aulasQuePodeMarcar) {
+								sql = "INSERT INTO classortbd.aula_proibida(disciplinaid, horaindex, diaindex)"
+										+ "	VALUES (" + idDisciplinaSelecionada + ", " + row + ", " + col + ");";
+								try {
+									statement.execute(sql);
+								} catch (SQLException e1) {
+									e1.printStackTrace();
+								}
 							}
 						}
 					}
