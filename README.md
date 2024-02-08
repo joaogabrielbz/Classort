@@ -27,5 +27,6 @@ O Classort é uma aplicação desenvolvida para automatizar o processo de geraç
 
 ## Como Usar:
 1. Ao abrir o classort pela primeira vez, será solicitado sua conexão com o banco de dados. Esse procedimento só precisará ser feito uma vez, pelo técnico instalador, e as credenciais do cliente serão salvas para que nao seja necessário realizar esse procedimento todas as vezes em que executar o programa
-   ![Login no BD](img/1.png)
+
+![Login no BD](img/1.png)
 
