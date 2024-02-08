@@ -25,16 +25,17 @@ O Classort é uma aplicação desenvolvida para automatizar o processo de geraç
 3. Importe o arquivo .jar na branch main.
 5. Execute o programa e comece a utilizar o Classort!
 
-## Como Usar:
+# Como Usar:
+
 Ao abrir o Classort pela primeira vez, será solicitada a conexão com o banco de dados. Este procedimento, necessário apenas uma vez pelo técnico instalador, salvará as credenciais do cliente para futuras execuções do programa. Se o esquema "classortbd" não existir, será criado automaticamente:
 
-![Login no BD](img/1.png);
+![Login no BD](img/1.png)
 
 Após isso, o turno será selecionado. (Será possível criar turnos personalizados nas próximas atualizações):
 
 ![Turno](img/2.png)
 
-Avançando, o usuario poderá realizar o CRUD das turmas:
+Avançando, o usuário poderá realizar o CRUD das turmas:
 
 ![Turmas](img/3.png)
 
@@ -42,7 +43,7 @@ Em seguida, o usuário poderá realizar o CRUD das disciplinas, com seus respect
 
 ![Disciplinas](img/4.png)
 
-Assim, na próxima tela, o usuário poderá adicionar disciplinas e quantidades de aulas as turmas, que estão distribuidas em um layout intuitivo de paginação via botões laterais:
+Assim, na próxima tela, o usuário poderá adicionar disciplinas e quantidades de aulas às turmas, que estão distribuídas em um layout intuitivo de paginação via botões laterais:
 
 ![TurmaDisciplina](img/5.png)
 
@@ -53,15 +54,20 @@ Ao clicar em "Gerar horários" haverá uma tela que confirma se não existem pro
 Assim, finalmente, os horários serão exibidos, podendo ser visualizados na perspectiva da turma, do professor, e por dia da semana:
 
 ![porTurma](img/7.png)
+
 ![porProf](img/8.png)
+
 ![porDia](img/9.png)
 
-Caso as restrições não permitam que um horario seja matemáticamente gerado, uma tela notificará onde não foi possivel enquadrar determinado professor:
+Caso as restrições não permitam que um horário seja matematicamente gerado, uma tela notificará onde não foi possível enquadrar determinado professor:
+
 ![Erros](img/10.png)
 
-Ao clicar em "exportar", será aberto um explorador de arquivos, onde o usuário pode escolher o diretório para salvar as planilhas com os horarios
+Ao clicar em "exportar", será aberto um explorador de arquivos, onde o usuário pode escolher o diretório para salvar as planilhas com os horários
+
 ![explorar](img/11.png)
 
 E por fim, será criada uma pasta no diretório selecionado, com as planilhas separadas tambem por dia, disciplina e professor, onde cada uma das entidades cadastrada é uma sheet (folha) da planilha
 
 ![pasta](img/11.png)
+
