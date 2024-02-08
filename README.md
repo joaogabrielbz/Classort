@@ -39,7 +39,7 @@ Avançando, o usuário poderá realizar o CRUD das turmas:
 
 ![Turmas](img/3.png)
 
-Em seguida, o usuário poderá realizar o CRUD das disciplinas, com seus respectivos professores, aulas duplas e aulas que não podem ser agendadas:
+Em seguida, o usuário poderá realizar o CRUD das disciplinas, com seus respectivos professores, opção de aulas duplas e aulas que não podem ser agendadas:
 
 ![Disciplinas](img/4.png)
 
@@ -47,7 +47,7 @@ Assim, na próxima tela, o usuário poderá adicionar disciplinas e quantidades 
 
 ![TurmaDisciplina](img/5.png)
 
-Ao clicar em "Gerar horários" haverá uma tela que confirma se não existem professores com mais aulas que o permitido, ou turmas com aulas vagas. Caso haja algum problema, o usuário é obrigado a retornar, e caso esteja tudo certo, ele poderá prosseguir:
+Ao clicar em "Gerar horários" haverá uma tela que confirma se não existem professores com mais aulas que o permitido, ou turmas com aulas vagas. Caso haja algum problema, o usuário é obrigado a retornar e editar, e caso esteja tudo certo, ele poderá prosseguir:
 
 ![TurmaDisciplina](img/6.png)
 
