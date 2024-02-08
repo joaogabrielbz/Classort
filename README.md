@@ -22,5 +22,5 @@ O Classort é uma aplicação desenvolvida para automatizar o processo de geraç
 
 1. Certifique-se de ter o Java Development Kit (JDK) e o PostgreSQL instalados em seu sistema.
 2. Clone este repositório para o seu computador.
-3. Importe o projeto em sua IDE Java preferida OU importe apenas o arquivo .jar.
+3. Importe o arquivo .jar na branch main.
 5. Execute o programa e comece a utilizar o Classort!
