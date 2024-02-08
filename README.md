@@ -69,5 +69,5 @@ Ao clicar em "exportar", será aberto um explorador de arquivos, onde o usuário
 
 E por fim, será criada uma pasta no diretório selecionado, com as planilhas separadas tambem por dia, disciplina e professor, onde cada uma das entidades cadastrada é uma sheet (folha) da planilha
 
-![pasta](img/11.png)
+![pasta](img/12.png)
 
