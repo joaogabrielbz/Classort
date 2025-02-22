@@ -1,4 +1,4 @@
-# Classort BETA
+# Classort (BETA)
 
 O Classort é um projeto desenvolvido para a Escola Lia Therezinha Merçon Rocha, capaz de gerar horários de aulas semanais. O projeto foi implementado utilizando Java Swing para a interface gráfica e PostgreSQL para o armazenamento de dados.
 Esta versão é apenas para testes das funcionalidades do programa
